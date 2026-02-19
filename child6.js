@@ -16,4 +16,4 @@ client.once("ready", async () => {
     });
 });
 
-client.login(process.env.CHILD7_TOKEN);
+client.login(process.env.CHILD6_TOKEN);
