@@ -96,7 +96,7 @@ master.on("messageCreate", async (message) => {
             const user = await bot.users.fetch(targetId);
 
             for (let i = 0; i < count; i++) {
-                await user.send(`ข้อความที่ ${i + 1} จากระบบ`);
+                await user.send(`มึงหลอนรอบที่ ${i + 1} ละนะ`);
                 await sleep(DELAY);
             }
 
