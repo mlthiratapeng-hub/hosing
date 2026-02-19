@@ -12,15 +12,14 @@ app.use(express.json());
 const BLOCKED_IDS = ["1155481097753337916"];
 
 // จำกัดจำนวนข้อความสูงสุดต่อครั้ง
-const MAX_MESSAGES = 999999;
+const MAX_MESSAGES = 3;
 
-// หน่วงเวลา (ms)
-const DELAY = 10;
+// หน่วงเวลาในแต่ละบอท (กัน rate limit)
+const DELAY = 1200;
 
 /* =========================
-   💤 Sleep Function
+   💤 Sleep
 ========================= */
-
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -47,7 +46,6 @@ function createChild(token) {
     childBots.push(bot);
 }
 
-// สร้าง child bots จาก ENV
 if (process.env.CHILD1_TOKEN) createChild(process.env.CHILD1_TOKEN);
 if (process.env.CHILD2_TOKEN) createChild(process.env.CHILD2_TOKEN);
 if (process.env.CHILD3_TOKEN) createChild(process.env.CHILD3_TOKEN);
@@ -77,7 +75,6 @@ master.once("ready", () => {
 
 master.on("messageCreate", async (message) => {
     if (message.author.bot) return;
-
     if (!message.content.startsWith("!vex")) return;
 
     const args = message.content.split(" ");
@@ -85,73 +82,63 @@ master.on("messageCreate", async (message) => {
     let count = parseInt(args[2]) || 1;
 
     if (!targetId) {
-        return message.reply("ใส่ ID ด้วย เช่น !vex 123456789 3");
+        return message.reply("ใส่ ID ด้วย เช่น !vex 123456789 2");
     }
 
     // 🔒 บล็อค ID
     if (BLOCKED_IDS.includes(targetId)) {
-        return message.reply("ID นี้ถูกบล็อค ไอ้เชี้ยเอ๋ออย่าหลอนให้มาก");
+        return message.reply("ID นี้ถูกบล็อค ❌");
     }
 
-    // จำกัดจำนวนสูงสุด
+    // จำกัดจำนวน
     if (count > MAX_MESSAGES) {
         count = MAX_MESSAGES;
     }
 
-    for (const bot of childBots) {
+    // 🚀 ส่งพร้อมกันระดับบอท
+    const tasks = childBots.map(async (bot) => {
         try {
             const user = await bot.users.fetch(targetId);
 
             for (let i = 0; i < count; i++) {
-                await user.send(`มึงหลอนรอบที่ ${i + 1} ละนะ`);
-                await sleep(DELAY);
+                await user.send(`ข้อความที่ ${i + 1} จาก ${bot.user.username}`);
+                await sleep(DELAY); // กัน rate limit
             }
 
         } catch (err) {
-            console.log("ส่งไม่สำเร็จ:", err.message);
+            console.log("Error:", err.message);
         }
-    }
+    });
 
-    message.reply(`ส่ง ${count} ยิงเรียบร้อย ✅`);
+    await Promise.all(tasks);
+
+    message.reply(`ส่ง ${count} ข้อความ จาก ${childBots.length} บอท เรียบร้อย ✅`);
 });
 
 master.login(process.env.MASTER_TOKEN);
 
 /* =========================
-   🌐 API SERVER (Optional)
+   🌐 API (optional)
 ========================= */
 
 app.post("/send", async (req, res) => {
-    const { targetId, count } = req.body;
+    const { targetId } = req.body;
 
-    if (!targetId) {
-        return res.json({ status: "no id" });
-    }
+    if (!targetId) return res.json({ status: "no id" });
+    if (BLOCKED_IDS.includes(targetId)) return res.json({ status: "blocked" });
 
-    if (BLOCKED_IDS.includes(targetId)) {
-        return res.json({ status: "blocked id" });
-    }
-
-    let messageCount = parseInt(count) || 1;
-    if (messageCount > MAX_MESSAGES) {
-        messageCount = MAX_MESSAGES;
-    }
-
-    for (const bot of childBots) {
+    const tasks = childBots.map(async (bot) => {
         try {
             const user = await bot.users.fetch(targetId);
-
-            for (let i = 0; i < messageCount; i++) {
-                await user.send(`ข้อความจาก API ${i + 1}`);
-                await sleep(DELAY);
-            }
-
+            await user.send("ข้อความจาก API");
         } catch (err) {
-            console.log("API error:", err.message);
+            console.log(err.message);
         }
-    }
+    });
 
-    res.json({ status: "sent", amount: messageCount });
+    await Promise.all(tasks);
+
+    res.json({ status: "sent" });
 });
 
 const PORT = process.env.PORT || 3000;
