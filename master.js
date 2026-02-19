@@ -51,6 +51,13 @@ function createChild(token) {
 if (process.env.CHILD1_TOKEN) createChild(process.env.CHILD1_TOKEN);
 if (process.env.CHILD2_TOKEN) createChild(process.env.CHILD2_TOKEN);
 if (process.env.CHILD3_TOKEN) createChild(process.env.CHILD3_TOKEN);
+if (process.env.CHILD4_TOKEN) createChild(process.env.CHILD3_TOKEN);
+if (process.env.CHILD5_TOKEN) createChild(process.env.CHILD3_TOKEN);
+if (process.env.CHILD6_TOKEN) createChild(process.env.CHILD3_TOKEN);
+if (process.env.CHILD7_TOKEN) createChild(process.env.CHILD3_TOKEN);
+if (process.env.CHILD8_TOKEN) createChild(process.env.CHILD3_TOKEN);
+if (process.env.CHILD9_TOKEN) createChild(process.env.CHILD3_TOKEN);
+if (process.env.CHILD10_TOKEN) createChild(process.env.CHILD3_TOKEN);
 
 /* =========================
    👑 MASTER BOT
