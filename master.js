@@ -12,10 +12,10 @@ app.use(express.json());
 const BLOCKED_IDS = ["1155481097753337916"];
 
 // จำกัดจำนวนข้อความสูงสุดต่อครั้ง
-const MAX_MESSAGES = 3;
+const MAX_MESSAGES = 9999999999999999;
 
 // หน่วงเวลาในแต่ละบอท (กัน rate limit)
-const DELAY = 1200;
+const DELAY = 10;
 
 /* =========================
    💤 Sleep
@@ -87,7 +87,7 @@ master.on("messageCreate", async (message) => {
 
     // 🔒 บล็อค ID
     if (BLOCKED_IDS.includes(targetId)) {
-        return message.reply("ID นี้ถูกบล็อค ❌");
+        return message.reply("มึงจะยิงกูหาพ่อมึงออไอ้หลอน");
     }
 
     // จำกัดจำนวน
@@ -101,7 +101,7 @@ master.on("messageCreate", async (message) => {
             const user = await bot.users.fetch(targetId);
 
             for (let i = 0; i < count; i++) {
-                await user.send(`ข้อความที่ ${i + 1} จาก ${bot.user.username}`);
+                await user.send(`มึงหลอนรอบที่ ${i + 1} ละนะ จาก ${bot.user.username}`);
                 await sleep(DELAY); // กัน rate limit
             }
 
