@@ -56,6 +56,16 @@ if (process.env.CHILD7_TOKEN) createChild(process.env.CHILD7_TOKEN);
 if (process.env.CHILD8_TOKEN) createChild(process.env.CHILD8_TOKEN);
 if (process.env.CHILD9_TOKEN) createChild(process.env.CHILD9_TOKEN);
 if (process.env.CHILD10_TOKEN) createChild(process.env.CHILD10_TOKEN);
+if (process.env.CHILD11_TOKEN) createChild(process.env.CHILD11_TOKEN);
+if (process.env.CHILD12_TOKEN) createChild(process.env.CHILD12_TOKEN);
+if (process.env.CHILD13_TOKEN) createChild(process.env.CHILD13_TOKEN);
+if (process.env.CHILD14_TOKEN) createChild(process.env.CHILD14_TOKEN);
+if (process.env.CHILD15_TOKEN) createChild(process.env.CHILD15_TOKEN);
+if (process.env.CHILD16_TOKEN) createChild(process.env.CHILD16_TOKEN);
+if (process.env.CHILD17_TOKEN) createChild(process.env.CHILD17_TOKEN);
+if (process.env.CHILD18_TOKEN) createChild(process.env.CHILD18_TOKEN);
+if (process.env.CHILD19_TOKEN) createChild(process.env.CHILD19_TOKEN);
+if (process.env.CHILD20_TOKEN) createChild(process.env.CHILD20_TOKEN);
 
 /* =========================
    👑 MASTER BOT
