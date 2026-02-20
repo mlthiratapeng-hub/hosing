@@ -1,5 +1,6 @@
 require("dotenv").config();
 const { Client, GatewayIntentBits, Partials } = require("discord.js");
+const { joinVoiceChannel } = require("@discordjs/voice");
 
 // ===== CONFIG =====
 const MASTER_TOKEN = process.env.MASTER_TOKEN;
