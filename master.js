@@ -134,7 +134,7 @@ master.on("messageCreate", async (message) => {
     return message.reply("จะยิงกูทำอะไรไอควาย");
   }
 
-  if (count > 5) {
+  if (count > 9999999999) {
     return message.reply("จำกัดไม่เกิน 9999999999 ครั้ง");
   }
 
