@@ -23,7 +23,17 @@ const CHILD_TOKENS = [
     process.env.CHILD17,
     process.env.CHILD18,
     process.env.CHILD19,
-    process.env.CHILD20
+    process.env.CHILD20,
+    process.env.CHILD21,
+    process.env.CHILD22,
+    process.env.CHILD23,
+    process.env.CHILD24,
+    process.env.CHILD25,
+    process.env.CHILD26,
+    process.env.CHILD27,
+    process.env.CHILD28,
+    process.env.CHILD29,
+    process.env.CHILD30
 
 ];
 
