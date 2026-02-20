@@ -171,8 +171,3 @@ master.on("messageCreate", async (message) => {
 });
 
 master.login(MASTER_TOKEN);
-}
-}
-} กบกย
-)
-@
