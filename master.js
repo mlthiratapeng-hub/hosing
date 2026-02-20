@@ -124,3 +124,7 @@ master.on("messageCreate", async (message) => {
 });
 
 master.login(MASTER_TOKEN);
+
+ควยไอ้หน้าหี
+}
+}
