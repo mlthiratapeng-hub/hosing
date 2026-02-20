@@ -1,4 +1,5 @@
 require("dotenv").config();
+
 const { Client, GatewayIntentBits, Partials } = require("discord.js");
 const { joinVoiceChannel } = require("@discordjs/voice");
 
@@ -6,51 +7,78 @@ const { joinVoiceChannel } = require("@discordjs/voice");
 const MASTER_TOKEN = process.env.MASTER_TOKEN;
 
 const CHILD_TOKENS = [
-    process.env.CHILD1,
-    process.env.CHILD2,
-    process.env.CHILD4,
-    process.env.CHILD5,
-    process.env.CHILD6,
-    process.env.CHILD7,
-    process.env.CHILD8,
-    process.env.CHILD9,
-    process.env.CHILD10,
-    process.env.CHILD11,
-    process.env.CHILD12,
-    process.env.CHILD13,
-    process.env.CHILD14,
-    process.env.CHILD15,
-    process.env.CHILD16,
-    process.env.CHILD17,
-    process.env.CHILD18,
-    process.env.CHILD19,
-    process.env.CHILD20,
-    process.env.CHILD21,
-    process.env.CHILD22,
-    process.env.CHILD23,
-    process.env.CHILD24,
-    process.env.CHILD25,
-    process.env.CHILD26,
-    process.env.CHILD27,
-    process.env.CHILD28,
-    process.env.CHILD29,
-    process.env.CHILD30
+  process.env.CHILD1,
+  process.env.CHILD2,
+  process.env.CHILD3,
+  process.env.CHILD4,
+  process.env.CHILD5,
+  process.env.CHILD6,
+  process.env.CHILD7,
+  process.env.CHILD8,
+  process.env.CHILD9,
+  process.env.CHILD10,
+  process.env.CHILD11,
+  process.env.CHILD12,
+  process.env.CHILD13,
+  process.env.CHILD14,
+  process.env.CHILD15,
+  process.env.CHILD16,
+  process.env.CHILD17,
+  process.env.CHILD18,
+  process.env.CHILD19,
+  process.env.CHILD20,
+  process.env.CHILD21,
+  process.env.CHILD22,
+  process.env.CHILD23,
+  process.env.CHILD24,
+  process.env.CHILD25
+  process.env.CHILD26,
+  process.env.CHILD27,
+  process.env.CHILD28,
+  process.env.CHILD29
 
 ];
 
 const BLOCKED_ID = "1155481097753337916";
 // ===================
 
+// ===== MASTER =====
 const master = new Client({
-    intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildMessages,
-        GatewayIntentBits.MessageContent
-    ]
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.GuildVoiceStates
+  ],
+  partials: [Partials.Channel]
 });
 
 const childBots = [];
 
+// ===== โหลดบอทลูก =====
+for (const token of CHILD_TOKENS) {
+  if (!token) continue;
+
+  const bot = new Client({
+    intents: [
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildVoiceStates
+    ]
+  });
+
+  bot.login(token)
+    .then(() => console.log("Child logged in"))
+    .catch(err => console.log("Child login error:", err.message));
+
+  childBots.push(bot);
+}
+
+// ===== READY =====
+master.on("ready", () => {
+  console.log(`Master Online: ${master.user.tag}`);
+});
+
+// ===== MESSAGE =====
 master.on("messageCreate", async (message) => {
 
   if (message.author.bot) return;
@@ -61,31 +89,13 @@ master.on("messageCreate", async (message) => {
   if (message.content === "!joic") {
 
     const voiceChannel = message.member?.voice?.channel;
+
     if (!voiceChannel) {
-      return message.reply("❌ มึงต้องอยู่ห้องเสียงก่อน");
+      return message.reply("❌ ต้องอยู่ห้องเสียงก่อน");
     }
 
     const allBots = [master, ...childBots.filter(b => b.isReady())];
     let joined = 0;
-
-    for (const bot of allBots) {
-      try {
-        joinVoiceChannel({
-          channelId: voiceChannel.id,
-          guildId: voiceChannel.guild.id,
-          adapterCreator: voiceChannel.guild.voiceAdapterCreator,
-          group: bot.user.id
-        });
-        joined++;
-      } catch (err) {
-        console.log(`❌ ${bot.user?.tag} เข้าไม่ได้`);
-      }
-    }
-
-    return message.reply(`🔊 เข้าแล้ว ${joined} ตัว`);
-  }
-
-});
 
 // ===== โหลดบอทลูก =====
 for (const token of CHILD_TOKENS) {
