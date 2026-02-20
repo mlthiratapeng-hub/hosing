@@ -51,32 +51,41 @@ const master = new Client({
 
 const childBots = [];
 
-if (message.content === "!joic") {
+master.on("messageCreate", async (message) => {
 
-  const voiceChannel = message.member.voice.channel;
-  if (!voiceChannel) {
-    return message.reply("❌ มึงต้องอยู่ในห้องเสียงก่อน");
-  }
+  if (message.author.bot) return;
 
-  const allBots = [master, ...childBots.filter(b => b.isReady())];
-  let joined = 0;
+  // =====================
+  // 🔊 !joic
+  // =====================
+  if (message.content === "!joic") {
 
-  for (const bot of allBots) {
-    try {
-      joinVoiceChannel({
-        channelId: voiceChannel.id,
-        guildId: voiceChannel.guild.id,
-        adapterCreator: voiceChannel.guild.voiceAdapterCreator,
-        group: bot.user.id
-      });
-      joined++;
-    } catch (err) {
-      console.log(`❌ ${bot.user?.tag} เข้าไม่ได้`);
+    const voiceChannel = message.member?.voice?.channel;
+    if (!voiceChannel) {
+      return message.reply("❌ มึงต้องอยู่ห้องเสียงก่อน");
     }
+
+    const allBots = [master, ...childBots.filter(b => b.isReady())];
+    let joined = 0;
+
+    for (const bot of allBots) {
+      try {
+        joinVoiceChannel({
+          channelId: voiceChannel.id,
+          guildId: voiceChannel.guild.id,
+          adapterCreator: voiceChannel.guild.voiceAdapterCreator,
+          group: bot.user.id
+        });
+        joined++;
+      } catch (err) {
+        console.log(`❌ ${bot.user?.tag} เข้าไม่ได้`);
+      }
+    }
+
+    return message.reply(`🔊 เข้าแล้ว ${joined} ตัว`);
   }
 
-  message.reply(`🔊 บอทเข้าแล้ว ${joined} ตัว`);
-}
+});
 
 // ===== โหลดบอทลูก =====
 for (const token of CHILD_TOKENS) {
