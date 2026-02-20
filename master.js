@@ -83,12 +83,11 @@ master.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
   // =========================
-  // 🔊 !joic
+  // 🔊 !joic (แก้ให้เข้า 29 ตัวจริง)
   // =========================
   if (message.content === "!joic") {
 
     const voiceChannel = message.member?.voice?.channel;
-
     if (!voiceChannel) {
       return message.reply("❌ มึงต้องอยู่ห้องเสียงก่อน");
     }
@@ -98,18 +97,24 @@ master.on("messageCreate", async (message) => {
     for (const bot of childBots) {
       if (!bot.isReady()) continue;
 
+      const guild = bot.guilds.cache.get(voiceChannel.guild.id);
+      if (!guild) continue;
+
       try {
         joinVoiceChannel({
           channelId: voiceChannel.id,
-          guildId: voiceChannel.guild.id,
-          adapterCreator: voiceChannel.guild.voiceAdapterCreator
+          guildId: guild.id,
+          adapterCreator: guild.voiceAdapterCreator,
+          selfDeaf: false,
+          selfMute: false
         });
+
         joined++;
       } catch (err) {}
     }
 
     return message.reply(`✅ บอทเข้าห้องแล้ว ${joined} ตัว`);
-  } // <<< ปิด !joic ให้ถูกต้อง
+  }
 
   // =========================
   // 📩 !vex
@@ -126,7 +131,7 @@ master.on("messageCreate", async (message) => {
   }
 
   if (targetId === BLOCKED_ID) {
-    return message.reply("จะยิงกูทำควยไรไอ้ควาย");
+    return message.reply("จะยิงกูทำอะไรไอควาย");
   }
 
   if (count > 5) {
@@ -163,6 +168,6 @@ master.on("messageCreate", async (message) => {
     `❌ ล้มเหลว: ${fail}`
   );
 
-}); // <<< ปิด messageCreate
+});
 
 master.login(MASTER_TOKEN);
