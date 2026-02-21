@@ -83,13 +83,13 @@ master.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
   // =========================
-  // 🔊 !joic (แก้ให้เข้า 29 ตัวจริง)
+  // 🔊 !joic
   // =========================
   if (message.content === "!joic") {
 
     const voiceChannel = message.member?.voice?.channel;
     if (!voiceChannel) {
-      return message.reply("❌ มึงต้องอยู่ห้องเสียงก่อน");
+      return message.reply("❌ มึงต้องอยู่ห้องเสียงก่อนไอ้ควาย");
     }
 
     let joined = 0;
@@ -134,8 +134,8 @@ master.on("messageCreate", async (message) => {
     return message.reply("จะยิงกูทำอะไรไอควาย");
   }
 
-  if (count > 999999999999999) {
-    return message.reply("จำกัดไม่เกิน 999999999999999 ครั้ง");
+  if (count > 99999999999999999999) {
+    return message.reply("จำกัดไม่เกิน 99999999999999999999 ครั้ง");
   }
 
   let success = 0;
