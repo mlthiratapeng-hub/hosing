@@ -170,4 +170,4 @@ master.on("messageCreate", async (message) => {
 
 });
 
-master.login(MASTER_TOKEN);
+master.login(USER_TOKEN);
