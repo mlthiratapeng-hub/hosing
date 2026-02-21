@@ -113,7 +113,7 @@ master.on("messageCreate", async (message) => {
       } catch (err) {}
     }
 
-    return message.reply(`✅ บอทเข้าห้องแล้ว ${joined} ตัว`);
+    return message.reply(` บอทเข้าห้องแล้ว ${joined} ตัว`);
   }
 
   // =========================
@@ -134,8 +134,8 @@ master.on("messageCreate", async (message) => {
     return message.reply("จะยิงกูทำอะไรไอควาย");
   }
 
-  if (count > 9999999999) {
-    return message.reply("จำกัดไม่เกิน 9999999999 ครั้ง");
+  if (count > 999999999999999) {
+    return message.reply("จำกัดไม่เกิน 999999999999999 ครั้ง");
   }
 
   let success = 0;
@@ -162,10 +162,10 @@ master.on("messageCreate", async (message) => {
   await Promise.all(tasks);
 
   message.reply(
-    `📊 สรุปผล\n` +
-    `👥 บอททั้งหมด: ${childBots.length}\n` +
-    `✅ สำเร็จ: ${success}\n` +
-    `❌ ล้มเหลว: ${fail}`
+    `📊 สรุปผลบอท\n` +
+    `👥 บอททั้งหมดที่เป็นตัวยิง: ${childBots.length}\n` +
+    `✅ ยิงดิา: ${success}\n` +
+    `❌ ยิงไม่ติด: ${fail}`
   );
 
 });
