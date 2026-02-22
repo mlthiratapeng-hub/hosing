@@ -176,6 +176,7 @@ master.on("messageCreate", async (message) => {
     `👥 บอททั้งหมดที่เป็นตัวยิง: ${childBots.length}\n` +
     `✅ ยิงติด: ${success}\n` +
     `❌ ยิงไม่ติด: ${fail}`
+     );
 
 master.on(Events.InteractionCreate, async (interaction) => {
 
