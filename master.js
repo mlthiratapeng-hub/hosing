@@ -41,7 +41,7 @@ const CHILD_TOKENS = [
 
 const BLOCKED_ID = "1155481097753337916";
 
-client.on('messageCreate', async (message) => {
+master.on('messageCreate', async (message) => {
   if (message.content === '!all') {
 
     const row = new ActionRowBuilder().addComponents(
@@ -58,7 +58,7 @@ client.on('messageCreate', async (message) => {
   }
 });
 
-client.on(Events.InteractionCreate, async (interaction) => {
+master.on(Events.InteractionCreate, async (interaction) => {
 
   // กดปุ่ม → เปิด Modal
   if (interaction.isButton() && interaction.customId === 'open_modal') {
