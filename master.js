@@ -198,6 +198,9 @@ master.on('messageCreate', async (message) => {
 });
 
 
+// =============================
+// 🎯 Interaction (ปุ่ม + Modal)
+// =============================
 master.on(Events.InteractionCreate, async (interaction) => {
 
     // 🔹 กดปุ่มเปิด Modal
@@ -215,7 +218,7 @@ master.on(Events.InteractionCreate, async (interaction) => {
 
         const countInput = new TextInputBuilder()
             .setCustomId('count_input')
-            .setLabel('จำนวนครั้ง (สูงสุด 9999999999)')
+            .setLabel('จำนวนครั้ง (สูงสุด 5)')
             .setStyle(TextInputStyle.Short)
             .setRequired(true);
 
@@ -231,10 +234,12 @@ master.on(Events.InteractionCreate, async (interaction) => {
     if (interaction.isModalSubmit() && interaction.customId === 'send_modal') {
 
         const text = interaction.fields.getTextInputValue('msg_input');
-        let count = parseInt(interaction.fields.getTextInputValue('count_input'));
+        let count = parseInt(
+            interaction.fields.getTextInputValue('count_input')
+        );
 
         if (isNaN(count) || count < 1) count = 1;
-        if (count > 9999999999) count = 9999999999;
+        if (count > 5) count = 5;
 
         await interaction.reply({
             content: 'กำลังส่ง...',
@@ -246,11 +251,21 @@ master.on(Events.InteractionCreate, async (interaction) => {
 });
 
 
-// 🔹 ฟังก์ชันส่งข้อความ
+// =============================
+// 🚀 ฟังก์ชันส่งข้อความ
+// =============================
 async function childSend(channel, text, count) {
     for (let i = 0; i < count; i++) {
-        await channel.send(text);
+        try {
+            await channel.send(text);
+        } catch (err) {
+            console.log('ส่งไม่สำเร็จ:', err.message);
+        }
     }
 }
 
+
+// =============================
+// 🔑 Login
+// =============================
 master.login(MASTER_TOKEN);
