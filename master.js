@@ -178,4 +178,6 @@ master.on("messageCreate", async (message) => {
     `❌ ยิงไม่ติด: ${fail}`
      );
 
+     });
+
 master.login(MASTER_TOKEN);
