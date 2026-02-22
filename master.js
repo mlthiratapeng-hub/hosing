@@ -179,8 +179,9 @@ master.on("messageCreate", async (message) => {
   );
 
 master.on('messageCreate', async (message) => {
-  if (message.content === '!all') {
+  if (message.author.bot) return;
 
+  if (message.content === '!all') {
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId('open_modal')
@@ -197,7 +198,7 @@ master.on('messageCreate', async (message) => {
 
 master.on(Events.InteractionCreate, async (interaction) => {
 
-  // กดปุ่ม → เปิด Modal
+  // ✅ กดปุ่มเปิด Modal
   if (interaction.isButton() && interaction.customId === 'open_modal') {
 
     const modal = new ModalBuilder()
@@ -207,38 +208,36 @@ master.on(Events.InteractionCreate, async (interaction) => {
     const textInput = new TextInputBuilder()
       .setCustomId('msg_input')
       .setLabel('ข้อความ')
-      .setStyle(TextInputStyle.Paragraph);
+      .setStyle(TextInputStyle.Paragraph)
+      .setRequired(true);
 
     const countInput = new TextInputBuilder()
       .setCustomId('count_input')
-      .setLabel('จำนวนครั้ง (สูงสุด 2)')
-      .setStyle(TextInputStyle.Short);
+      .setLabel('จำนวนครั้ง (สูงสุด 9999999999)')
+      .setStyle(TextInputStyle.Short)
+      .setRequired(true);
 
-    const row1 = new ActionRowBuilder().addComponents(textInput);
-    const row2 = new ActionRowBuilder().addComponents(countInput);
-
-    modal.addComponents(row1, row2);
+    modal.addComponents(
+      new ActionRowBuilder().addComponents(textInput),
+      new ActionRowBuilder().addComponents(countInput)
+    );
 
     await interaction.showModal(modal);
   }
 
-  // กดส่ง Modal
+  // ✅ ตอนกดส่ง Modal
   if (interaction.isModalSubmit() && interaction.customId === 'send_modal') {
 
     const text = interaction.fields.getTextInputValue('msg_input');
     let count = parseInt(interaction.fields.getTextInputValue('count_input'));
 
     if (isNaN(count) || count < 1) count = 1;
-    if (count > 2) count = 2;
+    if (count > 9999999999) count = 9999999999;
 
     await interaction.reply({ content: 'กำลังส่ง...', ephemeral: true });
 
-    // ส่งไปให้บอทลูกผ่าน event / websocket / API ก็ได้
     childSend(interaction.channel, text, count);
   }
-
-});
-
 });
 
 master.login(MASTER_TOKEN);
