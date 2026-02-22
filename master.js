@@ -178,6 +178,9 @@ master.on("messageCreate", async (message) => {
     `❌ ยิงไม่ติด: ${fail}`
      );
 
+// =============================
+// Interaction
+// =============================
 master.on(Events.InteractionCreate, async (interaction) => {
 
     if (interaction.isButton() && interaction.customId === 'open_modal') {
@@ -227,4 +230,7 @@ master.on(Events.InteractionCreate, async (interaction) => {
     }
 });
 
+// =============================
+// LOGIN
+// =============================
 master.login(MASTER_TOKEN);
