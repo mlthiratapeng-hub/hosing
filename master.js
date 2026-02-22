@@ -178,32 +178,8 @@ master.on("messageCreate", async (message) => {
     `❌ ยิงไม่ติด: ${fail}`
   );
 
-master.on('messageCreate', async (message) => {
-    if (message.author.bot) return;
-
-    if (message.content === '!all') {
-
-        const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder()
-                .setCustomId('open_modal')
-                .setLabel('กรอกข้อความ')
-                .setStyle(ButtonStyle.Primary)
-        );
-
-        await message.reply({
-            content: 'กดปุ่มเพื่อกรอกข้อความ',
-            components: [row]
-        });
-    }
-});
-
-
-// =============================
-// 🎯 Interaction (ปุ่ม + Modal)
-// =============================
 master.on(Events.InteractionCreate, async (interaction) => {
 
-    // 🔹 กดปุ่มเปิด Modal
     if (interaction.isButton() && interaction.customId === 'open_modal') {
 
         const modal = new ModalBuilder()
@@ -218,7 +194,7 @@ master.on(Events.InteractionCreate, async (interaction) => {
 
         const countInput = new TextInputBuilder()
             .setCustomId('count_input')
-            .setLabel('จำนวนครั้ง (สูงสุด 5)')
+            .setLabel('จำนวน (1-5)')
             .setStyle(TextInputStyle.Short)
             .setRequired(true);
 
@@ -230,7 +206,6 @@ master.on(Events.InteractionCreate, async (interaction) => {
         await interaction.showModal(modal);
     }
 
-    // 🔹 ตอนกดส่ง Modal
     if (interaction.isModalSubmit() && interaction.customId === 'send_modal') {
 
         const text = interaction.fields.getTextInputValue('msg_input');
@@ -246,26 +221,10 @@ master.on(Events.InteractionCreate, async (interaction) => {
             ephemeral: true
         });
 
-        await childSend(interaction.channel, text, count);
+        for (let i = 0; i < count; i++) {
+            await interaction.channel.send(text);
+        }
     }
 });
 
-
-// =============================
-// 🚀 ฟังก์ชันส่งข้อความ
-// =============================
-async function childSend(channel, text, count) {
-    for (let i = 0; i < count; i++) {
-        try {
-            await channel.send(text);
-        } catch (err) {
-            console.log('ส่งไม่สำเร็จ:', err.message);
-        }
-    }
-}
-
-
-// =============================
-// 🔑 Login
-// =============================
 master.login(MASTER_TOKEN);
