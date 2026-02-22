@@ -25,6 +25,6 @@ client.once("ready", async () => {
   }
 });
 
-client.login(process.env.CHILD20_TOKEN);
+client.login(process.env.CHILD1_TOKEN);
 
 module.exports = client; // 👈 อันนี้สำคัญมากสำหรับ !all
