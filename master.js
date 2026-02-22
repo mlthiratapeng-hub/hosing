@@ -179,65 +179,78 @@ master.on("messageCreate", async (message) => {
   );
 
 master.on('messageCreate', async (message) => {
-  if (message.author.bot) return;
+    if (message.author.bot) return;
 
-  if (message.content === '!all') {
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId('open_modal')
-        .setLabel('กรอกข้อความ')
-        .setStyle(ButtonStyle.Primary)
-    );
+    if (message.content === '!all') {
 
-    await message.reply({
-      content: 'กดปุ่มเพื่อกรอกข้อความ',
-      components: [row]
-    });
-  }
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setCustomId('open_modal')
+                .setLabel('กรอกข้อความ')
+                .setStyle(ButtonStyle.Primary)
+        );
+
+        await message.reply({
+            content: 'กดปุ่มเพื่อกรอกข้อความ',
+            components: [row]
+        });
+    }
 });
+
 
 master.on(Events.InteractionCreate, async (interaction) => {
 
-  // ✅ กดปุ่มเปิด Modal
-  if (interaction.isButton() && interaction.customId === 'open_modal') {
+    // 🔹 กดปุ่มเปิด Modal
+    if (interaction.isButton() && interaction.customId === 'open_modal') {
 
-    const modal = new ModalBuilder()
-      .setCustomId('send_modal')
-      .setTitle('ส่งข้อความ');
+        const modal = new ModalBuilder()
+            .setCustomId('send_modal')
+            .setTitle('ส่งข้อความ');
 
-    const textInput = new TextInputBuilder()
-      .setCustomId('msg_input')
-      .setLabel('ข้อความ')
-      .setStyle(TextInputStyle.Paragraph)
-      .setRequired(true);
+        const textInput = new TextInputBuilder()
+            .setCustomId('msg_input')
+            .setLabel('ข้อความ')
+            .setStyle(TextInputStyle.Paragraph)
+            .setRequired(true);
 
-    const countInput = new TextInputBuilder()
-      .setCustomId('count_input')
-      .setLabel('จำนวนครั้ง (สูงสุด 9999999999)')
-      .setStyle(TextInputStyle.Short)
-      .setRequired(true);
+        const countInput = new TextInputBuilder()
+            .setCustomId('count_input')
+            .setLabel('จำนวนครั้ง (สูงสุด 9999999999)')
+            .setStyle(TextInputStyle.Short)
+            .setRequired(true);
 
-    modal.addComponents(
-      new ActionRowBuilder().addComponents(textInput),
-      new ActionRowBuilder().addComponents(countInput)
-    );
+        modal.addComponents(
+            new ActionRowBuilder().addComponents(textInput),
+            new ActionRowBuilder().addComponents(countInput)
+        );
 
-    await interaction.showModal(modal);
-  }
+        await interaction.showModal(modal);
+    }
 
-  // ✅ ตอนกดส่ง Modal
-  if (interaction.isModalSubmit() && interaction.customId === 'send_modal') {
+    // 🔹 ตอนกดส่ง Modal
+    if (interaction.isModalSubmit() && interaction.customId === 'send_modal') {
 
-    const text = interaction.fields.getTextInputValue('msg_input');
-    let count = parseInt(interaction.fields.getTextInputValue('count_input'));
+        const text = interaction.fields.getTextInputValue('msg_input');
+        let count = parseInt(interaction.fields.getTextInputValue('count_input'));
 
-    if (isNaN(count) || count < 1) count = 1;
-    if (count > 9999999999) count = 9999999999;
+        if (isNaN(count) || count < 1) count = 1;
+        if (count > 9999999999) count = 9999999999;
 
-    await interaction.reply({ content: 'กำลังส่ง...', ephemeral: true });
+        await interaction.reply({
+            content: 'กำลังส่ง...',
+            ephemeral: true
+        });
 
-    childSend(interaction.channel, text, count);
-  }
+        await childSend(interaction.channel, text, count);
+    }
 });
+
+
+// 🔹 ฟังก์ชันส่งข้อความ
+async function childSend(channel, text, count) {
+    for (let i = 0; i < count; i++) {
+        await channel.send(text);
+    }
+}
 
 master.login(MASTER_TOKEN);
