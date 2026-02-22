@@ -201,7 +201,7 @@ master.on(Events.InteractionCreate, async (interaction) => {
 
     const countInput = new TextInputBuilder()
       .setCustomId('count_input')
-      .setLabel('จำนวนครั้ง (สูงสุด 9999999999)')
+      .setLabel('จำนวนครั้ง (สูงสุด 2)')
       .setStyle(TextInputStyle.Short);
 
     const row1 = new ActionRowBuilder().addComponents(textInput);
@@ -219,7 +219,7 @@ master.on(Events.InteractionCreate, async (interaction) => {
     let count = parseInt(interaction.fields.getTextInputValue('count_input'));
 
     if (isNaN(count) || count < 1) count = 1;
-    if (count > 9999999999999) count = 9999999999999;
+    if (count > 2) count = 2;
 
     await interaction.reply({ content: 'กำลังส่ง...', ephemeral: true });
 
