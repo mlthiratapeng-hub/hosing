@@ -7,7 +7,7 @@ class ThreeOfTwoContent(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="3of2content", description="ส่งข้อความโปรโมทแบบในรูป")
+    @app_commands.command(name="spam", description="ส่งข้อความโปรโมทแบบในรูป")
     @app_commands.describe(
         message="ข้อความที่ต้องการส่ง",
         amount="จำนวนครั้ง"
