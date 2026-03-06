@@ -6,10 +6,7 @@ class Rep(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(
-        name="spam",
-        description="ส่งข้อความ"
-    )
+    @app_commands.command(name="spam", description="ข้อความ")
     @app_commands.describe(
         message="ข้อความที่ต้องการส่ง",
         amount="จำนวนครั้ง"
@@ -17,10 +14,16 @@ class Rep(commands.Cog):
     async def rep(self, interaction: discord.Interaction, message: str, amount: int):
 
         if amount > 50:
-            await interaction.response.send_message("จำนวนมากเกินไป (สูงสุด 50)", ephemeral=True)
+            await interaction.response.send_message(
+                "จำนวนสูงสุดคือ 50",
+                ephemeral=True
+            )
             return
 
-        await interaction.response.send_message("กำลังส่งข้อความ...", ephemeral=True)
+        # ข้อความแบบในรูป
+        await interaction.response.send_message(
+            "ทริกเกอร์ข้อความนี้แล้ว"
+        )
 
         for i in range(amount):
             await interaction.channel.send(f"# {message}")
