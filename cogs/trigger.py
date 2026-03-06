@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-class Rep(commands.Cog):
+class trigger.py(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -26,4 +26,4 @@ class Rep(commands.Cog):
             await interaction.channel.send(f"# {message}")
 
 async def setup(bot):
-    await bot.add_cog(Rep(bot))
+    await bot.add_cog(Trigger(bot))
