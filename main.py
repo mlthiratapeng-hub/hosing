@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 import os
+import asyncio
 
 TOKEN = os.getenv("TOKEN")
 
@@ -15,16 +16,11 @@ async def load_cogs():
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user}")
-    try:
-        synced = await bot.tree.sync()
-        print(f"Synced {len(synced)} commands")
-    except Exception as e:
-        print(e)
+    await bot.tree.sync()
 
 async def main():
     async with bot:
         await load_cogs()
         await bot.start(TOKEN)
 
-import asyncio
 asyncio.run(main())
