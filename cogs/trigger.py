@@ -2,53 +2,28 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-class Trigger(commands.Cog):
-
+class Rep(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.triggers = {}
 
-    @app_commands.command(name="send_message", description="ข้อความ")
-    async def send_message(
-        self,
-        interaction: discord.Interaction,
-        trigger: str,
-        message: str,
-        amount: int
-    ):
+    @app_commands.command(
+        name="spam",
+        description="ส่งข้อความ"
+    )
+    @app_commands.describe(
+        message="ข้อความที่ต้องการส่ง",
+        amount="จำนวนครั้ง"
+    )
+    async def rep(self, interaction: discord.Interaction, message: str, amount: int):
 
-        self.triggers[trigger.lower()] = (message, amount)
-
-        embed = discord.Embed(
-            title="สำเร็จ",
-            description=f"""
-Trigger: `{trigger}`
-Message: `{message}`
-Amount: `{amount}`
-""",
-            color=discord.Color.green()
-        )
-
-        await interaction.response.send_message(embed=embed, ephemeral=True)
-
-    @commands.Cog.listener()
-    async def on_message(self, message):
-
-        if message.author.bot:
+        if amount > 50:
+            await interaction.response.send_message("จำนวนมากเกินไป (สูงสุด 50)", ephemeral=True)
             return
 
-        msg = message.content.lower()
+        await interaction.response.send_message("กำลังส่งข้อความ...", ephemeral=True)
 
-        for trigger, data in self.triggers.items():
-
-            text, amount = data
-
-            if trigger in msg:
-
-                for _ in range(amount):
-                    await message.channel.send(f"# {text}")
-
-                break
+        for i in range(amount):
+            await interaction.channel.send(f"# {message}")
 
 async def setup(bot):
-    await bot.add_cog(Trigger(bot))
+    await bot.add_cog(Rep(bot))
