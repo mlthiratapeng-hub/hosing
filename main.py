@@ -1,26 +1,25 @@
 import discord
 from discord.ext import commands
-import os
+from discord import app_commands
 import asyncio
 
-TOKEN = os.getenv("TOKEN")
-
 intents = discord.Intents.default()
-intents.message_content = True
-
 bot = commands.Bot(command_prefix="!", intents=intents)
-
-async def load_cogs():
-    await bot.load_extension("cogs.rep")
 
 @bot.event
 async def on_ready():
-    print(f"Logged in as {bot.user}")
     await bot.tree.sync()
+    print(f"Logged in as {bot.user}")
 
-async def main():
-    async with bot:
-        await load_cogs()
-        await bot.start(TOKEN)
+@bot.tree.command(name="announce", description="ส่งข้อความประกาศ")
+@app_commands.describe(message="ข้อความ", amount="จำนวนครั้ง")
+async def announce(interaction: discord.Interaction, message: str, amount: int):
 
-asyncio.run(main())
+    channel = interaction.channel
+    await interaction.response.send_message("กำลังส่งข้อความ...", ephemeral=True)
+
+    for i in range(amount):
+        await channel.send(message)
+        await asyncio.sleep(2)
+
+bot.run("TOKEN")
