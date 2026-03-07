@@ -1,31 +1,26 @@
 import discord
 from discord.ext import commands
 from discord import app_commands
-import asyncio
-import os
 
-TOKEN = os.getenv("TOKEN")
+TOKEN = "MAIN_BOT_TOKEN"
 
 intents = discord.Intents.default()
-bot = commands.Bot(command_prefix="!", intents=intents)
+intents.message_content = True
 
-child_webhooks = [
-    "WEBHOOK_URL_BOT1",
-    "WEBHOOK_URL_BOT2"
-]
+bot = commands.Bot(command_prefix="!", intents=intents)
 
 @bot.event
 async def on_ready():
     await bot.tree.sync()
-    print(f"online {bot.user}")
+    print(f"Main bot online: {bot.user}")
 
-@bot.tree.command(name="aaa", description="ปิ้วว")
+@bot.tree.command(name="aaa", description="ปิ้ว")
 @app_commands.describe(
-    message="ข้อความ",
+    message="ข้อความที่จะส่ง",
     amount="จำนวนครั้ง",
-    channel1="ห้องที่1",
-    channel2="ห้องที่2",
-    channel3="ห้องที่3"
+    channel1="ห้องที่ 1",
+    channel2="ห้องที่ 2",
+    channel3="ห้องที่ 3"
 )
 async def aaa(
     interaction: discord.Interaction,
@@ -36,19 +31,12 @@ async def aaa(
     channel3: discord.TextChannel = None
 ):
 
-    channels = [c for c in [channel1, channel2, channel3] if c]
+    channels = [c.id for c in [channel1, channel2, channel3] if c]
 
-    await interaction.response.send_message("กำลังส่ง...", ephemeral=True)
+    trigger = f"TRIGGER|{message}|{amount}|{','.join(map(str, channels))}"
 
-    for i in range(amount):
+    await interaction.channel.send(trigger)
 
-        for ch in channels:
-            await ch.send(message)
-
-        for webhook in child_webhooks:
-            async with bot.session.post(webhook, json={"content": message}):
-                pass
-
-        await asyncio.sleep(2)
+    await interaction.response.send_message("ส่ง trigger แล้ว", ephemeral=True)
 
 bot.run(TOKEN)
