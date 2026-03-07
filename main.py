@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-TOKEN = "MAIN_BOT_TOKEN"
+TOKEN = "TOKEN"
 
 intents = discord.Intents.default()
 intents.message_content = True
