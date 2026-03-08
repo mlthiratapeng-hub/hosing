@@ -2,41 +2,39 @@ import discord
 from discord.ext import commands
 from discord import app_commands
 
-TOKEN = "TOKEN"
-
 intents = discord.Intents.default()
-intents.message_content = True
-
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 @bot.event
 async def on_ready():
     await bot.tree.sync()
-    print(f"Main bot online: {bot.user}")
+    print(f"Logged in as {bot.user}")
 
-@bot.tree.command(name="aaa", description="ปิ้ว")
+@bot.tree.command(name="awe", description="ประกาศข้อความไปหลายห้อง")
 @app_commands.describe(
-    message="ข้อความที่จะส่ง",
-    amount="จำนวนครั้ง",
-    channel1="ห้องที่ 1",
-    channel2="ห้องที่ 2",
-    channel3="ห้องที่ 3"
+    message="ข้อความที่จะประกาศ",
+    amount="จำนวนห้อง (สูงสุด 3)"
 )
-async def aaa(
-    interaction: discord.Interaction,
-    message: str,
-    amount: int,
-    channel1: discord.TextChannel,
-    channel2: discord.TextChannel = None,
-    channel3: discord.TextChannel = None
-):
+async def awe(interaction: discord.Interaction, message: str, amount: int):
 
-    channels = [c.id for c in [channel1, channel2, channel3] if c]
+    if amount > 3:
+        amount = 3
+    if amount < 1:
+        amount = 1
 
-    trigger = f"TRIGGER|{message}|{amount}|{','.join(map(str, channels))}"
+    sent = 0
 
-    await interaction.channel.send(trigger)
+    for channel in interaction.guild.text_channels:
+        if sent >= amount:
+            break
+        try:
+            await channel.send(f"📢 {message}")
+            sent += 1
+        except:
+            pass
 
-    await interaction.response.send_message("ส่ง trigger แล้ว", ephemeral=True)
+    await interaction.response.send_message(
+        f"ส่งประกาศไป {sent} ห้องแล้ว", ephemeral=True
+    )
 
-bot.run(TOKEN)
+bot.run("TOKEN")
