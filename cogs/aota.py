@@ -27,7 +27,7 @@ class Aota(commands.Cog):
 
         await asyncio.sleep(1)
 
-        # บอทตอบข้อความให้ทุกคนเห็น
+        # ข้อความที่ trigger ให้ทุกคนเห็น
         for i in range(amount):
             await interaction.channel.send(message)
 
