@@ -8,7 +8,7 @@ class Aota(commands.Cog):
 
     @app_commands.command(name="aota", description="Trigger message")
     @app_commands.describe(
-        message="ข้อความที่ต้องการทริกเกอร์",
+        message="ข้อความ",
         amount="จำนวนการส่ง (สูงสุด 3)"
     )
     async def aota(self, interaction: discord.Interaction, message: str, amount: int):
