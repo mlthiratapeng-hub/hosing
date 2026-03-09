@@ -7,7 +7,7 @@ class Aota(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="aoa", description="Trigger message")
+    @app_commands.command(name="aota", description="Trigger message")
     @app_commands.describe(
         message="ข้อความที่จะทริกเกอร์",
         amount="จำนวน (สูงสุด 3)"
@@ -19,20 +19,19 @@ class Aota(commands.Cog):
         if amount < 1:
             amount = 1
 
-        # ส่งข้อความหลัก
-        main_msg = await interaction.channel.send(
-            f"🚀 Trigger `{message}` x{amount}"
+        # ข้อความหลัก (เห็นแค่คุณ)
+        await interaction.response.send_message(
+            f"🚀 Trigger {amount} x{amount}",
+            ephemeral=True
         )
-
-        await interaction.response.defer(ephemeral=True)
 
         await asyncio.sleep(1)
 
-        # ส่งข้อความแบบ reply ใต้ข้อความหลัก
+        # ข้อความที่ reply ใต้ trigger (ก็เห็นแค่คุณ)
         for i in range(amount):
-            await interaction.channel.send(
+            await interaction.followup.send(
                 message,
-                reference=main_msg
+                ephemeral=True
             )
 
 async def setup(bot):
