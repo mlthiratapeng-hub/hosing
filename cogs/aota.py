@@ -8,8 +8,8 @@ class Aota(commands.Cog):
 
     @app_commands.command(name="aota", description="Trigger message")
     @app_commands.describe(
-        message="ข้อความ",
-        amount="จำนวนการส่ง (สูงสุด 3)"
+        message="ข้อความที่ต้องการทริกเกอร์",
+        amount="จำนวน (สูงสุด 3)"
     )
     async def aota(self, interaction: discord.Interaction, message: str, amount: int):
 
@@ -18,11 +18,13 @@ class Aota(commands.Cog):
         if amount < 1:
             amount = 1
 
+        # ตอบเฉพาะคนสั่ง
         await interaction.response.send_message(
             f"🚀 Triggering `{message}` x{amount}",
             ephemeral=True
         )
 
+        # ส่งจริงให้ทุกคนเห็น
         for i in range(amount):
             await interaction.channel.send(message)
 
