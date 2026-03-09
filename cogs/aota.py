@@ -7,7 +7,7 @@ class Aota(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="aota", description="Trigger message")
+    @app_commands.command(name="a", description="Trigger message")
     @app_commands.describe(
         message="ข้อความที่จะทริกเกอร์",
         amount="จำนวน (สูงสุด 3)"
@@ -19,17 +19,19 @@ class Aota(commands.Cog):
         if amount < 1:
             amount = 1
 
-        # ข้อความสถานะ (เห็นแค่คนสั่ง)
+        # ข้อความสถานะ เห็นแค่คนสั่ง
         await interaction.response.send_message(
-            f"🚀 กำลัง Trigger `{message}` x{amount}",
+            f"🚀 Trigger `{message}` x{amount}",
             ephemeral=True
         )
 
         await asyncio.sleep(1)
 
-        # ข้อความที่ trigger ให้ทุกคนเห็น
+        channel = interaction.channel
+
+        # ส่งข้อความจริงให้ทุกคนเห็น
         for i in range(amount):
-            await interaction.channel.send(message)
+            await channel.send(message)
 
 async def setup(bot):
     await bot.add_cog(Aota(bot))
