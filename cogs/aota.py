@@ -7,7 +7,7 @@ class Aota(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="aota", description="Trigger message")
+    @app_commands.command(name="aoa", description="Trigger message")
     @app_commands.describe(
         message="ข้อความที่จะทริกเกอร์",
         amount="จำนวน (สูงสุด 3)"
