@@ -10,8 +10,8 @@ class Aota(commands.Cog):
     @app_commands.command(name="aota", description="Trigger message")
     async def aota(self, interaction: discord.Interaction, message: str, amount: int):
 
-        if amount > 3:
-            amount = 3
+        if amount > 999:
+            amount = 999
         if amount < 1:
             amount = 1
 
