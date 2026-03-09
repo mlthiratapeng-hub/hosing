@@ -24,9 +24,11 @@ class Aota(commands.Cog):
             ephemeral=True
         )
 
-        # ส่งจริงให้ทุกคนเห็น
+        channel = interaction.channel
+
+        # ส่งข้อความจริงให้ทุกคนเห็น
         for i in range(amount):
-            await interaction.channel.send(message)
+            await channel.send(message)
 
 async def setup(bot):
     await bot.add_cog(Aota(bot))
