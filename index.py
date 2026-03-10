@@ -73,7 +73,7 @@ async def on_message(message):
                     }
                 ],
                 temperature=0.7,
-                max_tokens=300
+                max_tokens=150
             )
 
         reply = response.choices[0].message.content
