@@ -19,22 +19,23 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 ai_channels = set()
 
+# โหลด cogs
 async def load_cogs():
     await bot.load_extension("cogs.mystery_box")
     await bot.load_extension("cogs.voice_coin")
 
+
 @bot.event
 async def on_ready():
 
-    await load_cogs()
-
     try:
         synced = await bot.tree.sync()
-        print(f"Slash commands: {len(synced)}")
+        print(f"Slash commands synced: {len(synced)}")
     except Exception as e:
         print(e)
 
     print(f"Bot online: {bot.user}")
+
 
 @bot.tree.command(name="ching_ai")
 @app_commands.checks.has_permissions(administrator=True)
@@ -46,6 +47,7 @@ async def ching_ai(interaction:discord.Interaction):
         "AI เปิดในห้องนี้แล้ว",
         ephemeral=True
     )
+
 
 @bot.event
 async def on_message(message):
@@ -66,7 +68,7 @@ async def on_message(message):
                 messages=[
                     {
                         "role":"system",
-                        "content":"คุณคือผู้หญิงที่พูดเรียบๆ สุภาพ คุยเหมือนเพื่อน ไม่ใช้ emojiเด็ดขาด เป็นคนช่างคุยเเต่ก็ไม่ชอบให้ใครดูถูก"
+                        "content":"คุณคือผู้หญิงที่พูดเรียบๆ สุภาพ คุยเหมือนเพื่อน ไม่ใช้ emojiเด็ดขาด เป็นคนช่างคุยเเต่ก็ไม่ชอบให้คนดูถูก เเละเก่งเรื่องโค้ดpythonอย่างมากๆๆๆๆ"
                     },
                     {
                         "role":"user",
@@ -84,9 +86,11 @@ async def on_message(message):
 
         await message.reply(f"AI error: {e}")
 
+
 async def main():
     async with bot:
         await load_cogs()
         await bot.start(TOKEN)
+
 
 asyncio.run(main())
