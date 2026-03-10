@@ -41,9 +41,9 @@ class VoiceCoin(commands.Cog):
 
             if member.id in join_time:
 
-                minutes = int((time.time()-join_time[member.id])/60)
+                minutes=int((time.time()-join_time[member.id])/60)
 
-                coins = minutes*5
+                coins=minutes*5
 
                 data=load()
 
