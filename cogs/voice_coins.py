@@ -1,54 +1,61 @@
 import discord
 from discord.ext import commands
-import time
 import json
+import time
 
-DATA_FILE = "config.json"
+FILE="data.json"
 
-def load_data():
+join_time={}
+
+def load():
+
     try:
-        with open(DATA_FILE) as f:
+        with open(FILE) as f:
             return json.load(f)
     except:
-        return {}
+        return {"coins":{}}
 
-def save_data(data):
-    with open(DATA_FILE,"w") as f:
+def save(data):
+
+    with open(FILE,"w") as f:
         json.dump(data,f,indent=4)
 
-join_time = {}
 
-class VoiceCoins(commands.Cog):
+class VoiceCoin(commands.Cog):
 
     def __init__(self,bot):
-        self.bot = bot
+        self.bot=bot
+
 
     @commands.Cog.listener()
     async def on_voice_state_update(self,member,before,after):
 
-        data = load_data()
-
-        if "coins" not in data:
-            data["coins"] = {}
-
-        user = str(member.id)
+        if member.bot:
+            return
 
         if after.channel and not before.channel:
-            join_time[user] = time.time()
+
+            join_time[member.id]=time.time()
 
         if before.channel and not after.channel:
 
-            if user in join_time:
+            if member.id in join_time:
 
-                minutes = int((time.time()-join_time[user])/60)
+                minutes = int((time.time()-join_time[member.id])/60)
 
-                coins = minutes * 5
+                coins = minutes*5
 
-                data["coins"][user] = data["coins"].get(user,0) + coins
+                data=load()
 
-                save_data(data)
+                user=str(member.id)
 
-                del join_time[user]
+                data["coins"][user]=data["coins"].get(user,0)+coins
+
+                save(data)
+
+                del join_time[member.id]
+
 
 async def setup(bot):
-    await bot.add_cog(VoiceCoins(bot))
+
+    await bot.add_cog(VoiceCoin(bot))
