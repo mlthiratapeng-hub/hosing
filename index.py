@@ -14,21 +14,14 @@ OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 openai.api_key = OPENAI_API_KEY
 openai.api_base = "https://openrouter.ai/api/v1"
 
-intents = discord.Intents.default()
-intents.message_content = True
-intents.voice_states = True
-
+intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 ai_channels = set()
 
-# ================= LOAD COGS =================
-
 async def load_cogs():
     await bot.load_extension("cogs.mystery_box")
-    await bot.load_extension("cogs.voice_coins")
-
-# ================= READY =================
+    await bot.load_extension("cogs.voice_coin")
 
 @bot.event
 async def on_ready():
@@ -37,26 +30,22 @@ async def on_ready():
 
     try:
         synced = await bot.tree.sync()
-        print(f"Slash commands synced: {len(synced)}")
+        print(f"Slash commands: {len(synced)}")
     except Exception as e:
         print(e)
 
     print(f"Bot online: {bot.user}")
 
-# ================= SLASH COMMAND =================
-
-@bot.tree.command(name="ching_ai", description="เปิด AI ในห้องนี้")
+@bot.tree.command(name="ching_ai")
 @app_commands.checks.has_permissions(administrator=True)
-async def ching_ai(interaction: discord.Interaction):
+async def ching_ai(interaction:discord.Interaction):
 
     ai_channels.add(interaction.channel.id)
 
     await interaction.response.send_message(
-        "AI เปิดในห้องนี้แล้ว พิมพ์คุยได้",
+        "AI เปิดในห้องนี้แล้ว",
         ephemeral=True
     )
-
-# ================= AI CHAT =================
 
 @bot.event
 async def on_message(message):
@@ -76,15 +65,14 @@ async def on_message(message):
                 model="deepseek/deepseek-chat",
                 messages=[
                     {
-                        "role": "system",
-                        "content": "คุณคือผู้หญิงที่พูดเรียบๆ สุภาพ คุยเหมือนเพื่อน ไม่ใช้ emoji น่ารักเป็นกันเอง และช่วยเรื่องโค้ดได้ ตอบเกี่ยวกับเรื่องทะลึ้งก็ได้ถ้ามีคนถาม เป็นสาวช่างคุย ตอบยาวๆ"
+                        "role":"system",
+                        "content":"คุณคือผู้หญิงที่พูดเรียบๆ สุภาพ คุยเหมือนเพื่อน ไม่ใช้ emojiเด็ดขาด เป็นคนช่างคุยเเต่ก็ไม่ชอบให้ใครดูถูก"
                     },
                     {
-                        "role": "user",
-                        "content": message.content
+                        "role":"user",
+                        "content":message.content
                     }
                 ],
-                temperature=0.7,
                 max_tokens=150
             )
 
@@ -93,11 +81,8 @@ async def on_message(message):
         await message.reply(reply)
 
     except Exception as e:
+
         await message.reply(f"AI error: {e}")
-
-    await bot.process_commands(message)
-
-# ================= RUN =================
 
 async def main():
     async with bot:
