@@ -11,6 +11,7 @@ TOKEN = os.getenv("TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 openai.api_key = OPENAI_API_KEY
+openai.api_base = "https://openrouter.ai/api/v1"
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -19,14 +20,23 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 ai_channels = set()
 
+# ================= READY =================
+
 @bot.event
 async def on_ready():
-    await bot.tree.sync()
+    try:
+        synced = await bot.tree.sync()
+        print(f"Slash commands synced: {len(synced)}")
+    except Exception as e:
+        print(e)
+
     print(f"Bot online: {bot.user}")
 
-# เปิด AI ในห้อง
+# ================= SLASH COMMAND =================
+
 @bot.tree.command(name="ching_ai", description="เปิด AI ในห้องนี้")
 @app_commands.checks.has_permissions(administrator=True)
+
 async def ching_ai(interaction: discord.Interaction):
 
     ai_channels.add(interaction.channel.id)
@@ -36,7 +46,8 @@ async def ching_ai(interaction: discord.Interaction):
         ephemeral=True
     )
 
-# ฟังข้อความ
+# ================= AI CHAT =================
+
 @bot.event
 async def on_message(message):
 
@@ -49,17 +60,11 @@ async def on_message(message):
     try:
 
         response = openai.ChatCompletion.create(
-            model="gpt-4o-mini",
+            model="deepseek/deepseek-chat",
             messages=[
                 {
                     "role": "system",
-                    "content": """
-                    You are a friendly female Discord user.
-                    Speak like a normal girl chatting with friends.
-                    Be casual, fun, and helpful.
-                    You can help with coding too.
-                    Keep messages natural and not too long.
-                    """
+                    "content": "คุณคือผู้หญิงนิสัยดี พูดเหมือนเพื่อน คุยสบายๆ เป็นกันเอง ช่วยตอบคำถามได้ทุกเรื่องรวมถึงโค้ด"
                 },
                 {
                     "role": "user",
@@ -68,11 +73,12 @@ async def on_message(message):
             ]
         )
 
-        reply = response["choices"][0]["message"]["content"]
+        reply = response.choices[0].message.content
 
         await message.reply(reply)
 
     except Exception as e:
+
         await message.reply(f"AI error: {e}")
 
     await bot.process_commands(message)
