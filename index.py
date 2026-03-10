@@ -36,13 +36,12 @@ async def on_ready():
 
 @bot.tree.command(name="ching_ai", description="เปิด AI ในห้องนี้")
 @app_commands.checks.has_permissions(administrator=True)
-
 async def ching_ai(interaction: discord.Interaction):
 
     ai_channels.add(interaction.channel.id)
 
     await interaction.response.send_message(
-        "เปิด AI ในห้องนี้แล้ว พิมพ์คุยได้เลย 💬",
+        "AI เปิดในห้องนี้แล้ว พิมพ์คุยได้เยยย",
         ephemeral=True
     )
 
@@ -59,26 +58,29 @@ async def on_message(message):
 
     try:
 
-        response = openai.ChatCompletion.create(
-            model="deepseek/deepseek-chat",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "คุณคือผู้หญิงนิสัยดี พูดเหมือนเพื่อน คุยสบายๆ เป็นกันเอง ช่วยตอบคำถามได้ทุกเรื่องรวมถึงโค้ด"
-                },
-                {
-                    "role": "user",
-                    "content": message.content
-                }
-            ]
-        )
+        async with message.channel.typing():
+
+            response = openai.ChatCompletion.create(
+                model="deepseek/deepseek-chat",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "คุณคือผู้หญิงที่พูดเรียบๆ สุภาพ คุยเหมือนเพื่อน ไม่ใช้ emoji ตอบสั้น กระชับ และช่วยเรื่องโค้ดได้"
+                    },
+                    {
+                        "role": "user",
+                        "content": message.content
+                    }
+                ],
+                temperature=0.7,
+                max_tokens=300
+            )
 
         reply = response.choices[0].message.content
 
         await message.reply(reply)
 
     except Exception as e:
-
         await message.reply(f"AI error: {e}")
 
     await bot.process_commands(message)
