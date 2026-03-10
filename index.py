@@ -4,6 +4,7 @@ from discord import app_commands
 import openai
 import os
 from dotenv import load_dotenv
+import asyncio
 
 load_dotenv()
 
@@ -15,15 +16,25 @@ openai.api_base = "https://openrouter.ai/api/v1"
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.voice_states = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 ai_channels = set()
 
+# ================= LOAD COGS =================
+
+async def load_cogs():
+    await bot.load_extension("cogs.mystery_box")
+    await bot.load_extension("cogs.voice_coins")
+
 # ================= READY =================
 
 @bot.event
 async def on_ready():
+
+    await load_cogs()
+
     try:
         synced = await bot.tree.sync()
         print(f"Slash commands synced: {len(synced)}")
@@ -41,7 +52,7 @@ async def ching_ai(interaction: discord.Interaction):
     ai_channels.add(interaction.channel.id)
 
     await interaction.response.send_message(
-        "AI เปิดในห้องนี้แล้ว พิมพ์คุยได้เยยย",
+        "AI เปิดในห้องนี้แล้ว พิมพ์คุยได้",
         ephemeral=True
     )
 
@@ -54,6 +65,7 @@ async def on_message(message):
         return
 
     if message.channel.id not in ai_channels:
+        await bot.process_commands(message)
         return
 
     try:
@@ -65,7 +77,7 @@ async def on_message(message):
                 messages=[
                     {
                         "role": "system",
-                        "content": "คุณคือผู้หญิงที่พูดเรียบๆ สุภาพ คุยเหมือนเพื่อน ไม่ใช้ emoji ตอบสั้น กระชับ และช่วยเรื่องโค้ดทุกอย่าง คุณไม่◌ูดที่ทำร้ายจิตใจ เเละคุณเป็นคนที่ตอบไวไม่ชอบให้คนอื่นต้องรอ"
+                        "content": "คุณคือผู้หญิงที่พูดเรียบๆ สุภาพ คุยเหมือนเพื่อน ไม่ใช้ emoji ตอบสั้น กระชับ และช่วยเรื่องโค้ดได้"
                     },
                     {
                         "role": "user",
@@ -85,4 +97,11 @@ async def on_message(message):
 
     await bot.process_commands(message)
 
-bot.run(TOKEN)
+# ================= RUN =================
+
+async def main():
+    async with bot:
+        await load_cogs()
+        await bot.start(TOKEN)
+
+asyncio.run(main())
