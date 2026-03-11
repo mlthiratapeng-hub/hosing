@@ -21,9 +21,7 @@ ai_channels = set()
 
 # โหลด cogs
 async def load_cogs():
-    await bot.load_extension("cogs.mystery_box")
-    await bot.load_extension("cogs.voice_coin")
-
+    await bot.load_extension("cogs.code")
 
 @bot.event
 async def on_ready():
