@@ -21,7 +21,7 @@ ai_channels = set()
 
 # โหลด cogs
 async def load_cogs():
-    await bot.load_extension("cogs.code")
+    await bot.load_extension("cogs.cord")
 
 @bot.event
 async def on_ready():
