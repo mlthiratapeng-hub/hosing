@@ -1,39 +1,53 @@
 import discord
 from discord.ext import commands
+import openai
 import io
+import os
 
-class CodeModal(discord.ui.Modal, title="สร้างไฟล์ code.py"):
-
-    code = discord.ui.TextInput(
-        label="พิมพ์โค้ดที่ต้องการ",
-        style=discord.TextStyle.paragraph,
-        placeholder="เช่น print('Hello World')",
-        required=True,
-        max_length=2000
-    )
-
-    async def on_submit(self, interaction: discord.Interaction):
-
-        file_content = self.code.value
-
-        file = discord.File(
-            fp=io.BytesIO(file_content.encode()),
-            filename="code.py"
-        )
-
-        await interaction.response.send_message(
-            "📁 ดาวน์โหลดไฟล์ได้ด้านล่าง",
-            file=file
-        )
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+openai.api_key = OPENAI_API_KEY
+openai.api_base = "https://openrouter.ai/api/v1"
 
 
 class Code(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @discord.app_commands.command(name="code", description="สร้างไฟล์ code.py")
-    async def code(self, interaction: discord.Interaction):
-        await interaction.response.send_modal(CodeModal())
+    @discord.app_commands.command(name="code", description="ให้ AI สร้างโค้ดเป็นไฟล์")
+    async def code(self, interaction: discord.Interaction, prompt: str):
+
+        await interaction.response.defer()
+
+        try:
+            response = openai.ChatCompletion.create(
+                model="deepseek/deepseek-chat",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "ตอบกลับเป็นโค้ด python อย่างเดียว"
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                max_tokens=1500
+            )
+
+            code = response.choices[0].message.content
+
+            file = discord.File(
+                fp=io.BytesIO(code.encode()),
+                filename="code.py"
+            )
+
+            await interaction.followup.send(
+                content="📂 นี่คือไฟล์โค้ดที่สร้างให้",
+                file=file
+            )
+
+        except Exception as e:
+            await interaction.followup.send(f"error: {e}")
 
 
 async def setup(bot):
