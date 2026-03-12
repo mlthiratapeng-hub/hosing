@@ -3,12 +3,14 @@ from discord.ext import commands
 from discord.ui import Button, View
 from discord import app_commands
 import asyncio
+import aiohttp
 
 class WebhookSpamView(View):
-    def __init__(self, webhook_url, max_spam):
+    def __init__(self, webhook_url, max_spam, message):
         super().__init__()
         self.webhook_url = webhook_url
         self.max_spam = max_spam
+        self.message = message
         self.is_spamming = False
 
     @discord.ui.button(label="Start Spam", style=discord.ButtonStyle.success)
@@ -20,17 +22,20 @@ class WebhookSpamView(View):
         self.is_spamming = True
         await interaction.response.send_message("Spamming started!", ephemeral=True)
 
-        webhook = discord.SyncWebhook.from_url(self.webhook_url)
-        for i in range(self.max_spam):
-            if not self.is_spamming:
-                break
-            try:
-                webhook.send(f"Spam message {i+1}")
-                await asyncio.sleep(1)
-            except discord.NotFound:
-                await interaction.followup.send("Spamming failed: Webhook not found.", ephemeral=True)
-                self.is_spamming = False
-                return
+        async with aiohttp.ClientSession() as session:
+            for i in range(self.max_spam):
+                if not self.is_spamming:
+                    break
+                try:
+                    async with session.post(self.webhook_url, json={"content": self.message}) as response:
+                        if response.status != 204:
+                            await interaction.followup.send("Spamming failed: Webhook not found.", ephemeral=True)
+                            self.is_spamming = False
+                            return
+                except Exception as e:
+                    await interaction.followup.send(f"Spamming failed: {str(e)}", ephemeral=True)
+                    self.is_spamming = False
+                    return
 
         await interaction.followup.send(f"Spammed {self.max_spam} times!", ephemeral=True)
 
@@ -49,19 +54,19 @@ class WebhookCog(commands.Cog):
 
     @app_commands.command(name="setup_webhook", description="Setup webhook spam")
     @app_commands.default_permissions(administrator=True)
-    async def setup_webhook_command(self, interaction: discord.Interaction, webhook_url: str, max_spam: int):
-        if max_spam > 9999999:
-            await interaction.response.send_message("Maximum spam count is 9999999.", ephemeral=True)
+    async def setup_webhook_command(self, interaction: discord.Interaction, webhook_url: str, max_spam: int, message: str):
+        if max_spam > 999999999999999999999999:
+            await interaction.response.send_message("Maximum spam count is 999999999999999999999999.", ephemeral=True)
             return
 
         embed = discord.Embed(
             title="Webhook Spammer",
-            description="This command allows you to spam a webhook. Enter the webhook URL and the maximum number of times to spam.",
+            description="This command allows you to spam a webhook. Enter the webhook URL, the maximum number of times to spam, and the message to spam.",
             color=0x000000
         )
         embed.set_footer(text="Use responsibly!")
 
-        view = WebhookSpamView(webhook_url, max_spam)
+        view = WebhookSpamView(webhook_url, max_spam, message)
         await interaction.response.send_message(embed=embed, view=view)
 
 async def setup(bot):
