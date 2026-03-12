@@ -22,10 +22,10 @@ class boomCog(commands.Cog):
                 self.is_running = False
                 self.message_count = 0
                 
-            @discord.ui.button(label="เริ่ม", style=discord.ButtonStyle.green)
+            @discord.ui.button(label="รันโปรเเกรม", style=discord.ButtonStyle.green)
             async def start(self, interaction: discord.Interaction, button: discord.ui.Button):
                 if self.is_running:
-                    await interaction.response.send_message("กำลังสแปมอยู่แล้ว!", ephemeral=True)
+                    await interaction.response.send_message("กำลังสแปมอยู่แล้ว", ephemeral=True)
                     return
                     
                 self.is_running = True
@@ -47,14 +47,14 @@ class boomCog(commands.Cog):
                 self.is_running = False
                 await interaction.followup.send(f"สแปมเสร็จสิ้น! ส่งไปทั้งหมด {self.message_count} ข้อความ", ephemeral=True)
                             
-            @discord.ui.button(label="หยุด", style=discord.ButtonStyle.red)
+            @discord.ui.button(label="หยุดโปรเเกรม", style=discord.ButtonStyle.red)
             async def stop(self, interaction: discord.Interaction, button: discord.ui.Button):
                 if not self.is_running:
-                    await interaction.response.send_message("ยังไม่ได้เริ่มสแปม!", ephemeral=True)
+                    await interaction.response.send_message("ยังไม่ได้เริ่มสแปมอย่าโง่", ephemeral=True)
                     return
                     
                 self.is_running = False
-                await interaction.response.send_message("กำลังหยุดสแปม...", ephemeral=True)
+                await interaction.response.send_message("กำลังหยุดสแปมนะค่ะ", ephemeral=True)
         
         await interaction.response.send_message(embed=embed, view=ControlButtons())
 
