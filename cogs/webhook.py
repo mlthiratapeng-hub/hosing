@@ -5,10 +5,9 @@ from discord import app_commands
 import asyncio
 
 class WebhookSpamView(View):
-    def __init__(self, webhook_url, gif_url, max_spam):
+    def __init__(self, webhook_url, max_spam):
         super().__init__()
         self.webhook_url = webhook_url
-        self.gif_url = gif_url
         self.max_spam = max_spam
         self.is_spamming = False
 
@@ -22,11 +21,16 @@ class WebhookSpamView(View):
         await interaction.response.send_message("Spamming started!", ephemeral=True)
 
         webhook = discord.SyncWebhook.from_url(self.webhook_url)
-        for _ in range(self.max_spam):
+        for i in range(self.max_spam):
             if not self.is_spamming:
                 break
-            webhook.send(embed=discord.Embed().set_image(url=self.gif_url))
-            await asyncio.sleep(1)
+            try:
+                webhook.send(f"Spam message {i+1}")
+                await asyncio.sleep(1)
+            except discord.NotFound:
+                await interaction.followup.send("Spamming failed: Webhook not found.", ephemeral=True)
+                self.is_spamming = False
+                return
 
         await interaction.followup.send(f"Spammed {self.max_spam} times!", ephemeral=True)
 
@@ -43,21 +47,21 @@ class WebhookCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="webhook", description="Spam a webhook")
+    @app_commands.command(name="setup_webhook", description="Setup webhook spam")
     @app_commands.default_permissions(administrator=True)
-    async def webhook_command(self, interaction: discord.Interaction, webhook_url: str, gif_url: str, max_spam: int):
-        if max_spam > 9999999999:
-            await interaction.response.send_message("Maximum spam count is 9999999999.", ephemeral=True)
+    async def setup_webhook_command(self, interaction: discord.Interaction, webhook_url: str, max_spam: int):
+        if max_spam > 9999999:
+            await interaction.response.send_message("Maximum spam count is 9999999.", ephemeral=True)
             return
 
         embed = discord.Embed(
             title="Webhook Spammer",
-            description="This command allows you to spam a webhook. Enter the webhook URL, GIF URL, and the maximum number of times to spam.",
+            description="This command allows you to spam a webhook. Enter the webhook URL and the maximum number of times to spam.",
             color=0x000000
         )
         embed.set_footer(text="Use responsibly!")
 
-        view = WebhookSpamView(webhook_url, gif_url, max_spam)
+        view = WebhookSpamView(webhook_url, max_spam)
         await interaction.response.send_message(embed=embed, view=view)
 
 async def setup(bot):
