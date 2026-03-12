@@ -4,9 +4,6 @@ from discord.ui import Button, View
 from discord import app_commands
 import asyncio
 
-intents = discord.Intents.all()
-bot = commands.Bot(command_prefix="!", intents=intents)
-
 class WebhookSpamView(View):
     def __init__(self, webhook_url):
         super().__init__()
@@ -15,12 +12,12 @@ class WebhookSpamView(View):
     @discord.ui.button(label="Spam Webhook", style=discord.ButtonStyle.danger)
     async def spam_button(self, interaction: discord.Interaction, button: Button):
         await interaction.response.send_message("Enter the number of times to spam:", ephemeral=True)
-        
+
         def check(m):
             return m.author == interaction.user and m.channel == interaction.channel
 
         try:
-            msg = await bot.wait_for('message', timeout=30.0, check=check)
+            msg = await interaction.client.wait_for('message', timeout=30.0, check=check)
             spam_count = int(msg.content)
         except asyncio.TimeoutError:
             await interaction.followup.send("You took too long to respond.", ephemeral=True)
@@ -39,21 +36,21 @@ class WebhookSpamView(View):
 
         await interaction.followup.send(f"Spammed {spam_count} times!", ephemeral=True)
 
-@bot.tree.command(name="webhook")
-@app_commands.describe(webhook_url="The webhook URL to spam")
-async def webhook_command(interaction: discord.Interaction, webhook_url: str):
-    embed = discord.Embed(
-        title="Webhook Spammer",
-        description="This command allows you to spam a webhook. Enter the webhook URL and press the button to start spamming.",
-        color=0x000000
-    )
-    embed.set_footer(text="Use responsibly!")
+class WebhookCog(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
 
-    view = WebhookSpamView(webhook_url)
-    await interaction.response.send_message(embed=embed, view=view)
+    @app_commands.command(name="webhook", description="Spam a webhook")
+    async def webhook_command(self, interaction: discord.Interaction, webhook_url: str):
+        embed = discord.Embed(
+            title="Webhook Spammer",
+            description="This command allows you to spam a webhook. Enter the webhook URL and press the button to start spamming.",
+            color=0x000000
+        )
+        embed.set_footer(text="Use responsibly!")
 
-async def main():
-    async with bot:
-        await bot.start(os.getenv("TOKEN"))
+        view = WebhookSpamView(webhook_url)
+        await interaction.response.send_message(embed=embed, view=view)
 
-asyncio.run(main())
+async def setup(bot):
+    await bot.add_cog(WebhookCog(bot))
