@@ -59,4 +59,4 @@ class boomCog(commands.Cog):
         await interaction.response.send_message(embed=embed, view=ControlButtons())
 
 async def setup(bot):
-    await bot.add_cog(WebhookCog(bot))
+    await bot.add_cog(boomCog(bot))
