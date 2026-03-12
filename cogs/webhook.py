@@ -29,7 +29,7 @@ class WebhookSpamView(View):
                 try:
                     async with session.post(self.webhook_url, json={"content": self.message}) as response:
                         if response.status != 204:
-                            await interaction.followup.send("Spamming failed: Webhook not found.", ephemeral=True)
+                            await interaction.followup.send("สเเปมสำเร็จ หรือ webhookผิด", ephemeral=True)
                             self.is_spamming = False
                             return
                 except Exception as e:
