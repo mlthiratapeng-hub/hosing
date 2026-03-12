@@ -20,7 +20,7 @@ class WebhookSpamView(View):
             return
 
         self.is_spamming = True
-        await interaction.response.send_message("Spamming started!", ephemeral=True)
+        await interaction.response.send_message("กำลังเริ่มสเเปม", ephemeral=True)
 
         async with aiohttp.ClientSession() as session:
             for i in range(self.max_spam):
@@ -46,7 +46,7 @@ class WebhookSpamView(View):
             return
 
         self.is_spamming = False
-        await interaction.response.send_message("Spamming stopped!", ephemeral=True)
+        await interaction.response.send_message("หยุดโปรเเกรมเเล้ว", ephemeral=True)
 
 class WebhookCog(commands.Cog):
     def __init__(self, bot):
@@ -61,7 +61,7 @@ class WebhookCog(commands.Cog):
 
         embed = discord.Embed(
             title="Webhook Spammer",
-            description="This command allows you to spam a webhook. Enter the webhook URL, the maximum number of times to spam, and the message to spam.",
+            description="ใส่ลิ้งWebhook ตามด้วยจำนวนเเละคำ กดปุ่มเขียวเพื่อเริ่มโปรเเกรม เเดงเพื่อหยุดโปรเเกรม",
             color=0x000000
         )
         embed.set_footer(text="Use responsibly!")
