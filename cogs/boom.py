@@ -4,7 +4,7 @@ from discord.ext import commands
 import aiohttp
 import asyncio
 
-class WebhookCog(commands.Cog):
+class boomCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
