@@ -42,7 +42,7 @@ class WebhookSpamView(View):
     @discord.ui.button(label="Stop Spam", style=discord.ButtonStyle.danger)
     async def stop_button(self, interaction: discord.Interaction, button: Button):
         if not self.is_spamming:
-            await interaction.response.send_message("No spamming in progress.", ephemeral=True)
+            await interaction.response.send_message("หยุดเเล้ว", ephemeral=True)
             return
 
         self.is_spamming = False
