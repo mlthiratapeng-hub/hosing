@@ -87,7 +87,7 @@ async def on_message(message):
         await message.reply(f"AI error: {e}")
 
 async def main():
-    async with bot:
-        await bot.start(TOKEN)
+async with bot:
+await bot.start(TOKEN)
 
 asyncio.run(main())
