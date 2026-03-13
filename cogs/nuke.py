@@ -94,5 +94,5 @@ async def boom(ctx):
     else:
         await ctx.send("คุณไม่ใช่แอดมิน คุณไม่สามารถใช้คำสั่งนี้ได้")
 
-# Run the bot
-bot.run("YOUR_BOT_TOKEN")
+async def setup(bot):
+    await bot.add_cog(Nuke(bot))
