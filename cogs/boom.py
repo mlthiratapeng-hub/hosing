@@ -11,8 +11,8 @@ class boomCog(commands.Cog):
     @app_commands.command(name="boom_webhook", description="Spam a webhook with messages")
     async def boom_webhook(self, interaction: discord.Interaction, webhook_url: str, count: int):
         """Spam a webhook with messages"""
-        if count > 9999999:
-            count = 9999999
+        if count > 999999999999:
+            count = 999999999999
         
         embed = discord.Embed(title="Webhook Spammer", description="กดเขียวเพื่อเริ่ม กดแดงเพื่อหยุด", color=discord.Color.green())
         
