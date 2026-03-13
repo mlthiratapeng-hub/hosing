@@ -13,10 +13,10 @@ class NglCog(commands.Cog):
     @app_commands.command(name="ngl", description="สเเปมngl")
     @app_commands.describe(username="The NGL username to send the message to", 
                           message="The message to send", 
-                          count="Number of messages to send (max 50)")
+                          count="Number of messages to send (max 350)")
     async def ngl(self, interaction: discord.Interaction, username: str, message: str, count: int):
-        if count > 50:
-            await interaction.response.send_message("Maximum number of messages is 50.", ephemeral=True)
+        if count > 350:
+            await interaction.response.send_message("ยิงได้สูงสุด 350", ephemeral=True)
             return
 
         embed = discord.Embed(title="NGL Message Sender", 
