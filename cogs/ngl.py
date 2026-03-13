@@ -35,7 +35,7 @@ class NglConfirmationView(discord.ui.View):
         self.count = count
         self.is_running = False
 
-    @discord.ui.button(label="Send", style=discord.ButtonStyle.green)
+    @discord.ui.button(label="เริ่มย◌ิง", style=discord.ButtonStyle.green)
     async def confirm(self, interaction: discord.Interaction, button: discord.ui.Button):
         if self.is_running:
             await interaction.response.send_message("Already running.", ephemeral=True)
@@ -69,7 +69,7 @@ class NglConfirmationView(discord.ui.View):
         await interaction.followup.send(f"Sent {sent_count} messages to {self.username}!", ephemeral=True)
         self.is_running = False
 
-    @discord.ui.button(label="Stop", style=discord.ButtonStyle.red)
+    @discord.ui.button(label="หยุด", style=discord.ButtonStyle.red)
     async def stop(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not self.is_running:
             await interaction.response.send_message("Not running.", ephemeral=True)
