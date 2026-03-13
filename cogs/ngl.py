@@ -10,7 +10,7 @@ class NglCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="ngl", description="Send anonymous messages via ngl.link")
+    @app_commands.command(name="ngl", description="สเเปมngl")
     @app_commands.describe(username="The NGL username to send the message to", 
                           message="The message to send", 
                           count="Number of messages to send (max 50)")
