@@ -8,7 +8,7 @@ class boomCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="boom_webhook", description="Spam a webhook with messages")
+    @app_commands.command(name="boom_webhook", description="สแปมแบบทำให้โดนจำกัด")
     async def boom_webhook(self, interaction: discord.Interaction, webhook_url: str, count: int):
         """Spam a webhook with messages"""
         if count > 999999999999:
