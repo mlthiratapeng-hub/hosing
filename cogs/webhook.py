@@ -55,8 +55,8 @@ class WebhookCog(commands.Cog):
     @app_commands.command(name="setup_webhook", description="Setup webhook spam")
     @app_commands.default_permissions(administrator=True)
     async def setup_webhook_command(self, interaction: discord.Interaction, webhook_url: str, max_spam: int, message: str):
-        if max_spam > 999999999999999999999999:
-            await interaction.response.send_message("Maximum spam count is 999999999999999999999999.", ephemeral=True)
+        if max_spam > 9999999999999999999999999:
+            await interaction.response.send_message("Maximum spam count is 9999999999999999999999999.", ephemeral=True)
             return
 
         embed = discord.Embed(
