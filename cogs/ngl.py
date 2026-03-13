@@ -42,7 +42,7 @@ class NglConfirmationView(discord.ui.View):
             return
 
         self.is_running = True
-        await interaction.response.send_message("Sending messages...", ephemeral=True)
+        await interaction.response.send_message("กำลังยิง", ephemeral=True)
 
         sent_count = 0
         for _ in range(self.count):
