@@ -100,5 +100,3 @@ class Nuke(commands.Cog):
 
 async def setup(bot):
     await bot.add_cog(Nuke(bot))
-
-bot.run(bot_token)
