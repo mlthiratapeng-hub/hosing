@@ -24,6 +24,7 @@ async def load_cogs():
     await bot.load_extension("cogs.cord")
     await bot.load_extension("cogs.webhook")
     await bot.load_extension("cogs.boom")
+    await bot.load_extension("cogs.ngl")
 
 @bot.event
 async def on_ready():
