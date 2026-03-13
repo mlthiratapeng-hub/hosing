@@ -72,7 +72,7 @@ class NglConfirmationView(discord.ui.View):
     @discord.ui.button(label="หยุด", style=discord.ButtonStyle.red)
     async def stop(self, interaction: discord.Interaction, button: discord.ui.Button):
         if not self.is_running:
-            await interaction.response.send_message("Not running.", ephemeral=True)
+            await interaction.response.send_message("มึงยังไม่ได้เริ่มยิงเลยไอ้ควาย", ephemeral=True)
             return
 
         self.is_running = False
