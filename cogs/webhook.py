@@ -52,7 +52,7 @@ class WebhookCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @app_commands.command(name="setup_webhook", description="Setup webhook spam")
+    @app_commands.command(name="setup_webhook", description="สเเปมเเละส่งข้อความwebhook")
     @app_commands.default_permissions(administrator=True)
     async def setup_webhook_command(self, interaction: discord.Interaction, webhook_url: str, max_spam: int, message: str):
         if max_spam > 9999999999999999999999999:
