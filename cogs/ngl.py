@@ -20,7 +20,7 @@ class NglCog(commands.Cog):
             return
 
         embed = discord.Embed(title="NGL Message Sender", 
-                            description=f"Send {count} messages to {username}?", 
+                            description=f"ยิงไป {count} ข้อความ ไปหา {username}?", 
                             color=discord.Color.blue())
         embed.add_field(name="Message", value=message, inline=False)
         embed.add_field(name="Count", value=count, inline=False)
