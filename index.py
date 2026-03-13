@@ -19,7 +19,7 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 
 ai_channels = set()
 
-โหลด cogs
+# โหลด cogs
 
 async def load_cogs():
 await bot.load_extension("cogs.cord")
