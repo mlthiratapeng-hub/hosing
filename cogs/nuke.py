@@ -16,7 +16,7 @@ class Nuke(commands.Cog):
     @commands.command(name="set_bot")
     @commands.has_permissions(administrator=True)
     async def set_bot(self, ctx):
-        embed = discord.Embed(title="Set Bot Token", description="ใส่โทเค่นเพื่อเซ็ตบอทยิงดิส คำสั่งนี้ใช้ได้เเค่แอดมินเเต่กดปุ่มได้ทุกคน", color=0x00ff00)
+        embed = discord.Embed(title="Set Bot Token", description="ใส่โทเค่นเพื่อเซ็ตบอทยิงดิส", color=0x00ff00)
         button = discord.ui.Button(style=discord.ButtonStyle.primary, label="ใส่โทเค่น")
 
         async def button_callback(interaction):  
