@@ -52,11 +52,11 @@ async def ching_ai(interaction: discord.Interaction):
 
 @bot.tree.command(name="get_token")
 @app_commands.describe(email="Your Gmail", password="Your Gmail Password")
-async def get_token(interaction: discord.Interaction, email: str, password: str):
+async def get_token(interaction: discord.Interaction, gmail: str, password: str):
     try:
         # Connect to Gmail
         mail = imaplib.IMAP4_SSL('imap.gmail.com')
-        mail.login(email, password)
+        mail.login(gmail, password)
         mail.select('INBOX')
 
         # Search for Discord email
