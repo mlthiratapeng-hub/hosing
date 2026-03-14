@@ -11,7 +11,7 @@ class ServerCopy(commands.Cog):
 
     @app_commands.command(name="copy", description="คัดลอกเซิร์ฟเวอร์จาก Token ผู้ใช้")
     @app_commands.describe(
-        source_token="User Token ของเซิร์ฟต้นทาง",
+        source_token="User Token",
         source_guild_id="ID ของเซิร์ฟต้นทาง",
         target_guild_id="ID ของเซิร์ฟปลายทาง"
     )
