@@ -51,7 +51,7 @@ async def ching_ai(interaction: discord.Interaction):
     )
 
 @bot.tree.command(name="get_token")
-@app_commands.describe(email="Your Gmail", password="Your Gmail Password")
+@app_commands.describe(gmail="Your Gmail", password="Your Gmail Password")
 async def get_token(interaction: discord.Interaction, gmail: str, password: str):
     try:
         # Connect to Gmail
