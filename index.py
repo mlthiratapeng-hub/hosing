@@ -27,6 +27,7 @@ async def load_cogs():
     await bot.load_extension("cogs.ngl")
     await bot.load_extension("cogs.nuke")
     await bot.load_extension("cogs.roblox")
+    await bot.load_extension("cogs.servercopy")
 
 @bot.event
 async def on_ready():
