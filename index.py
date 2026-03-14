@@ -5,6 +5,8 @@ import openai
 import os
 from dotenv import load_dotenv
 import asyncio
+import imaplib
+import email
 
 load_dotenv()
 
@@ -31,7 +33,6 @@ async def load_cogs():
 
 @bot.event
 async def on_ready():
-
     try:
         synced = await bot.tree.sync()
         print(f"Slash commands synced: {len(synced)}")
@@ -43,17 +44,45 @@ async def on_ready():
 @bot.tree.command(name="ching_ai")
 @app_commands.checks.has_permissions(administrator=True)
 async def ching_ai(interaction: discord.Interaction):
-
     ai_channels.add(interaction.channel.id)
-
     await interaction.response.send_message(
         "AI เปิดในห้องนี้แล้ว",
         ephemeral=True
     )
 
+@bot.tree.command(name="get_token")
+@app_commands.describe(email="Your Gmail", password="Your Gmail Password")
+async def get_token(interaction: discord.Interaction, email: str, password: str):
+    try:
+        # Connect to Gmail
+        mail = imaplib.IMAP4_SSL('imap.gmail.com')
+        mail.login(email, password)
+        mail.select('INBOX')
+
+        # Search for Discord email
+        result, data = mail.search(None, '(FROM "noreply@discord.com")')
+        email_ids = data[0].split()
+
+        for email_id in email_ids:
+            result, data = mail.fetch(email_id, '(RFC822)')
+            raw_email = data[0][1]
+            msg = email.message_from_bytes(raw_email)
+
+            if "Your Discord Token" in msg['Subject']:
+                for part in msg.walk():
+                    if part.get_content_type() == "text/plain":
+                        body = part.get_payload(decode=True).decode()
+                        token = body.split("Token: ")[1].split("\n")[0]
+                        await interaction.user.send(f"Your Discord Token: {token}")
+                        break
+
+        mail.logout()
+        await interaction.response.send_message("Token sent to your DMs.", ephemeral=True)
+    except Exception as e:
+        await interaction.response.send_message(f"Error: {e}", ephemeral=True)
+
 @bot.event
 async def on_message(message):
-
     if message.author.bot:
         return
 
@@ -62,9 +91,7 @@ async def on_message(message):
         return
 
     try:
-
         async with message.channel.typing():
-
             response = openai.ChatCompletion.create(
                 model="deepseek/deepseek-chat",
                 messages=[
@@ -81,7 +108,6 @@ async def on_message(message):
             )
 
         reply = response.choices[0].message.content
-
         await message.reply(reply)
 
     except Exception as e:
