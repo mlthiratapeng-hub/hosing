@@ -11,7 +11,6 @@ class VoiceTime(commands.Cog):
         self.voice_users = {}
         self.update_timer.start()
 
-    # /v command
     @app_commands.command(name="v", description="ให้บอทเข้า voice")
     async def join_voice(self, interaction: discord.Interaction):
 
@@ -23,6 +22,8 @@ class VoiceTime(commands.Cog):
             await interaction.response.send_message("คุณต้องอยู่ในห้องเสียงก่อน", ephemeral=True)
             return
 
+        await interaction.response.defer()
+
         channel = interaction.user.voice.channel
 
         if interaction.guild.voice_client:
@@ -30,9 +31,8 @@ class VoiceTime(commands.Cog):
         else:
             await channel.connect()
 
-        await interaction.response.send_message(f"บอทเข้า {channel.name} แล้ว")
+        await interaction.followup.send(f"บอทเข้า {channel.name} แล้ว")
 
-    # ตรวจจับเข้าออก voice
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
 
@@ -41,15 +41,12 @@ class VoiceTime(commands.Cog):
 
         loop = asyncio.get_event_loop()
 
-        # เข้า voice
         if before.channel is None and after.channel is not None:
             self.voice_users[member.id] = loop.time()
 
-        # ออก voice
         if before.channel is not None and after.channel is None:
             self.voice_users.pop(member.id, None)
 
-    # อัปเดตเวลาทุก 5 วิ
     @tasks.loop(seconds=5)
     async def update_timer(self):
 
