@@ -105,7 +105,7 @@ async def on_message(message):
                         "content": message.content
                     }
                 ],
-                max_tokens=150
+                max_tokens=300
             )
 
         reply = response.choices[0].message.content
