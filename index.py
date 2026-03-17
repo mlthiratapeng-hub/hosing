@@ -31,6 +31,7 @@ async def load_cogs():
     await bot.load_extension("cogs.roblox")
     await bot.load_extension("cogs.servercopy")
     await bot.load_extension("cogs.voicetime")
+    await bot.load_extension("cogs.casino")
 
 @bot.event
 async def on_ready():
