@@ -31,7 +31,7 @@ class Code(commands.Cog):
                         "content": prompt
                     }
                 ],
-                max_tokens=1500
+                max_tokens=900
             )
 
             code = response.choices[0].message.content
