@@ -4,9 +4,9 @@ import openai
 import io
 import os
 
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-openai.api_key = OPENAI_API_KEY
-openai.api_base = "https://openrouter.ai/api/v1"
+GOOGLE_API_KEY = os.getenv("goole_code")
+GOOGLE.api_key = Google Code
+GOOGLE.api_base = "https://code.google.com/"
 
 
 class Code(commands.Cog):
