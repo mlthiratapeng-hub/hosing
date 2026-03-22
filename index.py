@@ -11,7 +11,7 @@ import email
 load_dotenv()
 
 TOKEN = os.getenv("TOKEN")
-OPENAI_API_KEY = os.getenv("GOOLGE")
+GOOGLE_API_KEY = os.getenv("GOOGLE")
 
 openai.api_key = GOOLGE
 openai.api_base = "https://code.google.com/"
