@@ -11,7 +11,7 @@ import email
 load_dotenv()
 
 TOKEN = os.getenv("TOKEN")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+OPENAI_API_KEY = os.getenv("GOOLGE")
 
 openai.api_key = OPENAI_API_KEY
 openai.api_base = "https://openrouter.ai/api/v1"
