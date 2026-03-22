@@ -13,8 +13,8 @@ load_dotenv()
 TOKEN = os.getenv("TOKEN")
 OPENAI_API_KEY = os.getenv("GOOLGE")
 
-openai.api_key = OPENAI_API_KEY
-openai.api_base = "https://openrouter.ai/api/v1"
+openai.api_key = GOOLGE
+openai.api_base = "https://code.google.com/"
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!", intents=intents)
