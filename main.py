@@ -7,7 +7,7 @@ import time
 from threading import Thread
 from http.server import HTTPServer, BaseHTTPRequestHandler
 
-RENDER_URL = os.getenv("RENDER_EXTERNAL_URL") # ใส่ URL ของเว็บคุณใน Environment Variable
+RENDER_URL = os.getenv("RENDER_EXTERNAL_URL")
 
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
