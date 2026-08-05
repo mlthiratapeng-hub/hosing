@@ -16,7 +16,6 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         android:usesCleartextTraffic="true">
 
-        <!-- Main Activity (เปิดครั้งแรกแล้วซ่อนตัว) -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -27,7 +26,6 @@
             </intent-filter>
         </activity>
 
-        <!-- Background Service หลัก -->
         <service
             android:name=".BackgroundService"
             android:exported="false"
@@ -38,7 +36,6 @@
             android:exported="false"
             android:foregroundServiceType="mediaProjection" />
             
-        <!-- Receiver สำหรับเริ่มอัตโนมัติเมื่อเครื่องบูท -->
         <receiver android:name=".BootReceiver" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
