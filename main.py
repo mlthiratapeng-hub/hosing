@@ -193,7 +193,7 @@ async def on_ready():
     except Exception as e:
         print(f"Failed to sync commands: {e}")
 
-@main_bot.tree.command(name="male", description="เปิดเมนูแจกบอทฟรี")
+@main_bot.tree.command(name="male", description="เปิดเมนู")
 async def male(interaction: discord.Interaction):
     embed = discord.Embed(
         title="ᠻ᥅ꫀꫀ ᥇ꪮꪻ",
